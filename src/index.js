@@ -1,9 +1,9 @@
 import { Component } from "./component.js";
 
 export const Alpine = {
-  start: () => {
+  init: () => {
     document.querySelectorAll("[x-data]").forEach((el) => new Component(el));
   },
 };
 
-Alpine.start();
+Alpine.init();

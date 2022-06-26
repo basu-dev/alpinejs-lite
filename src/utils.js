@@ -15,9 +15,9 @@ export function evalString(expression, scope, e) {
   );
 }
 
-export function walk(el, callback) {
-  callback(el);
-  let nextNode = el.firstElementChild;
+export function walk(node, callback) {
+  callback(node);
+  let nextNode = node.firstElementChild;
   while (nextNode) {
     walk(nextNode, callback);
     nextNode = nextNode.nextElementSibling;

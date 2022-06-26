@@ -15,6 +15,22 @@
     .blue {
         color: blue;
     }
+
+    h4 {
+        padding: .5rem;
+        color: white;
+        background: #777;
+    }
+
+    input[type=text] {
+        padding: .5rem;
+        min-width: 250px;
+    }
+
+    button {
+        min-width: 250px;
+        padding: .5rem;
+    }
 </style>
 
 <body>
@@ -22,19 +38,23 @@
     <div x-data="{
         visible:false,
         name:'',
-        submit(){
+        toggleVisibility(){
             this.visible = !this.visible;
         }
     }">
 
-        <div x-bind:style="visible?{background:'red'}:{background:'blue'}">
-            This item should only be visible if `visible` flag is `true`.
-        </div>
-        <input x-on:input="name=$event.target.value">
-        <div x-bind:text="visible?'This text is visible':'This text is not visible'"></div>
+        <h4 x-bind:style="visible?{background:'red'}:{background:'blue'}">
+            Background style changes with toggling the button below
+        </h4>
+        <input type="text" x-on:input="name=$event.target.value" placeholder="Enter text to be reflected below">
+
         <div x-bind:text="name"></div>
-        <input type="checkbox" x-bind:checked="visible">
-        <button x-on:click="submit()">Toggle Visibility</button>
+        <br />
+        <div x-bind:text="visible?'Value of visible property is  true':'Value of visible property is  false'"></div>
+        <br />
+        <input type="checkbox" x-bind:checked="visible"><span x-bind:text="visible?'Visible':'Not Visible'"></span>
+        <br />
+        <button x-on:click="toggleVisibility()">Toggle</button>
 
     </div>
 
