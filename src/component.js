@@ -3,9 +3,9 @@ import { evalString, walk, getXAttributes } from "./utils.js";
 export class Component {
   constructor(el) {
     this.el = el;
-    this.data = { visible: false };
+    this.data = evalString(this.el.getAttribute("x-data"), { data: {} });
     this.listenForEvents();
-    this.updateAttributes(Object.keys[this.data]);
+    this.updateAttributes();
   }
 
   listenForEvents() {

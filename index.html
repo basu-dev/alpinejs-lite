@@ -21,7 +21,10 @@
 
     <div x-data="{
         visible:false,
-        name:''
+        name:'',
+        submit(){
+            this.visible = !this.visible;
+        }
     }">
 
         <div x-bind:style="visible?{background:'red'}:{background:'blue'}">
@@ -31,7 +34,7 @@
         <div x-bind:text="visible?'This text is visible':'This text is not visible'"></div>
         <div x-bind:text="name"></div>
         <input type="checkbox" x-bind:checked="visible">
-        <button x-on:click="visible = !visible">Toggle Visibility</button>
+        <button x-on:click="submit()">Toggle Visibility</button>
 
     </div>
 
