@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine Clone</title>
+</head>
+<style>
+    .red {
+        color: red;
+    }
+
+    .blue {
+        color: blue;
+    }
+</style>
+
+<body>
+
+    <div x-data="{
+        visible:false,
+        name:''
+    }">
+
+        <div x-bind:style="visible?{background:'red'}:{background:'blue'}">
+            This item should only be visible if `visible` flag is `true`.
+        </div>
+        <input x-on:input="name=$event.target.value">
+        <div x-bind:text="visible?'This text is visible':'This text is not visible'"></div>
+        <div x-bind:text="name"></div>
+        <input type="checkbox" x-bind:checked="visible">
+        <button x-on:click="visible = !visible">Toggle Visibility</button>
+
+    </div>
+
+    <script type="module" src="./src/index.js"></script>
+
+</body>
+
+</html>
