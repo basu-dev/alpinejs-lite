@@ -52,9 +52,9 @@ export class Component {
 
   handleBooleanAttris(truthy, el, attribute) {
     if (truthy) {
-      el.setAttribute(attribute, "");
+      el[attribute] = true;
     } else {
-      el.removeAttribute(attribute);
+      el[attribute] = false;
     }
   }
 
