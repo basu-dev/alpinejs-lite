@@ -8,10 +8,10 @@
 
 */
 
-export function evalString(expression, scope, e) {
+export function evalString(expression, scope, event) {
   return new Function(["data", "$event"], `with(data) return ${expression}`)(
     ...Object.values(scope),
-    e
+    event
   );
 }
 

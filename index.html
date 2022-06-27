@@ -9,11 +9,11 @@
 </head>
 <style>
     .red {
-        color: red;
+        background: red;
     }
 
     .blue {
-        color: blue;
+        background: blue;
     }
 
     h4 {
@@ -29,6 +29,7 @@
 
     button {
         min-width: 250px;
+        cursor: pointer;
         padding: .5rem;
     }
 </style>
@@ -43,7 +44,7 @@
         }
     }">
 
-        <h4 x-bind:style="visible?{background:'red'}:{background:'blue'}">
+        <h4 x-bind:class="visible?'red':'blue'">
             Background style changes with toggling the button below
         </h4>
         <input type="text" x-on:input="name=$event.target.value" placeholder="Enter text to be reflected below">
@@ -51,6 +52,7 @@
         <div x-bind:text="name"></div>
         <br />
         <div x-bind:text="visible?'Value of visible property is  true':'Value of visible property is  false'"></div>
+        <div x-bind:hidden="!visible">This text will be only visible when toggled.</div>
         <br />
         <input type="checkbox" x-bind:checked="visible"><span x-bind:text="visible?'Visible':'Not Visible'"></span>
         <br />
