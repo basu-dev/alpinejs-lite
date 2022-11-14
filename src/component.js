@@ -15,14 +15,17 @@ export class Component {
 
   listenForEvents() {
     let eventNames = [];
-    // [click]
     walk(this.$$el, (el) => {
       getXAttributes(el, "on").forEach((attr) =>
         eventNames.push(attr.split(":")[1])
       );
     });
+    // If user has added events that will be added at future states of DOM
+    if (this.$$data.$moreEvents) {
+      eventNames = [...eventNames, ...this.$$data.$moreEvents];
+    }
+
     eventNames = [...new Set(eventNames)];
-    console.log(eventNames);
 
     eventNames.forEach((eventName) => {
       this.$$el.addEventListener(eventName, ($event) => {

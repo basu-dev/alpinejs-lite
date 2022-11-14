@@ -12,20 +12,6 @@
         font-size: 20px;
     }
 
-    .red {
-        background: red;
-    }
-
-    .blue {
-        background: blue;
-    }
-
-    h4 {
-        padding: .5rem;
-        color: white;
-        background: #777;
-    }
-
     input[type=text],
     button {
         padding: .5rem;
@@ -62,7 +48,9 @@
 <body>
     <div x-data='{
         name:"",
-        incompleteTodos:["asdf"],
+        // This event will be added while todos are added
+        $moreEvents:["change"],
+        incompleteTodos:[],
         completedTodos:[],
         init(){
             fetch("https://jsonplaceholder.typicode.com/todos")
@@ -79,15 +67,11 @@
             this.incompleteTodos.push(this.name);
             this.name="";
         },
-        markDone(e){
-            console.log(e);
-            let index = e.target.dataset.index;
+        markDone(index){
             let todo = this.incompleteTodos.splice(index,1);
-            console.log(todo);
             this.completedTodos.push(todo);
         },
-        removeTodo(e){
-            let index = e.target.dataset.index;
+        removeTodo(index){
             this.completedTodos.splice(index,1);
         }
     }'>
@@ -100,8 +84,8 @@
                 <h3>Incomplete Todos</h3>
                 <ol x-bind:html="incompleteTodos.map((todo,index)=>(`
                     <li>
-                        <span >${todo}</span>
-                        <input data-index='${index}' type='checkbox' x-on:change='markDone($event)'>
+                        <span>${todo}</span>
+                        <input  type='checkbox' x-on:change='markDone(${index})'>
                     </li>
                     `)).join('')"></ol>
             </aside>
@@ -109,8 +93,8 @@
                 <h3>Completed Todos</h3>
                 <ol x-bind:html="completedTodos.map((todo,index)=>(`
                     <li>
-                        <span >${todo}</span>
-                        <input data-index='${index}' type='checkbox' x-on:change='removeTodo($event)'>
+                        <span>${todo}</span>
+                        <input type='checkbox' x-on:change='removeTodo(${index})'>
                     </li>
                     `)).join('')"></ol>
             </aside>
