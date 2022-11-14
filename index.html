@@ -8,6 +8,10 @@
     <title>Alpine Clone</title>
 </head>
 <style>
+    html {
+        font-size: 20px;
+    }
+
     .red {
         background: red;
     }
@@ -22,43 +26,100 @@
         background: #777;
     }
 
-    input[type=text] {
+    input[type=text],
+    button {
         padding: .5rem;
         min-width: 250px;
+        border-radius: 5px;
     }
 
     button {
-        min-width: 250px;
         cursor: pointer;
+        border: none;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    ol {
+        padding: 0;
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
         padding: .5rem;
+        border-bottom: 1px solid #eaeaea;
     }
 </style>
+<h1>Todo Manager</h1>
 
 <body>
-
-    <div x-data="{
-        visible:false,
-        name:'',
-        toggleVisibility(){
-            this.visible = !this.visible;
+    <div x-data='{
+        name:"",
+        incompleteTodos:["asdf"],
+        completedTodos:[],
+        init(){
+            fetch("https://jsonplaceholder.typicode.com/todos")
+            .then(data=>data.json()).then(
+                data=>{
+                    data.length=10;
+                    this.incompleteTodos = data.map(d=>d.title);
+               this.$$update(); 
+                }
+            ).catch()
+        },
+        addTodo(){
+            if(this.name.length<1)return;
+            setTimeout(() => {
+            this.incompleteTodos.push(this.name);
+            this.name="";
+            this.$$update();
+            },2000);
+        },
+        markDone(e){
+            console.log(e);
+            let index = e.target.dataset.index;
+            let todo = this.incompleteTodos.splice(index,1);
+            console.log(todo);
+            this.completedTodos.push(todo);
+        },
+        removeTodo(e){
+            let index = e.target.dataset.index;
+            this.completedTodos.splice(index,1);
         }
-    }">
-
-        <h4 x-bind:class="visible?'red':'blue'">
-            Background style changes with toggling the button below
-        </h4>
-        <input type="text" x-on:input="name=$event.target.value" placeholder="Enter text to be reflected below">
-
-        <div x-bind:text="name"></div>
+    }'>
+        <input type="text" x-bind:value="name" placeholder="Todo Name" x-on:input="name=$event.target.value">
         <br />
-        <div x-bind:text="visible?'Value of visible property is  true':'Value of visible property is  false'"></div>
-        <div x-bind:hidden="!visible">This text will be only visible when toggled.</div>
         <br />
-        <input type="checkbox" x-bind:checked="visible"><span x-bind:text="visible?'Visible':'Not Visible'"></span>
-        <br />
-        <button x-on:click="toggleVisibility()">Toggle</button>
-
+        <button x-on:click="addTodo()">Add</button>
+        <section class="grid">
+            <aside>
+                <h3>Incomplete Todos</h3>
+                <ol x-bind:html="incompleteTodos.map((todo,index)=>(`
+                    <li>
+                        <span >${todo}</span>
+                        <input data-index='${index}' type='checkbox' x-on:change='markDone($event)'>
+                    </li>
+                    `)).join('')"></ol>
+            </aside>
+            <aside>
+                <h3>Completed Todos</h3>
+                <ol x-bind:html="completedTodos.map((todo,index)=>(`
+                    <li>
+                        <span >${todo}</span>
+                        <input data-index='${index}' type='checkbox' x-on:change='removeTodo($event)'>
+                    </li>
+                    `)).join('')"></ol>
+            </aside>
+        </section>
     </div>
+
 
     <script type="module" src="./src/index.js"></script>
 

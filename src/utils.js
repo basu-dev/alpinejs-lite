@@ -1,11 +1,9 @@
 /*
-# 1. Create a new component instance for each element that has x-data attribuite
+# 1. Create a new component instance for each element that has x-data attribute
 # 2. Parse the data from string to object
-# 3. Look for all the events in whole node tree and delegate that event so that all event is captured
-# 4. After each event we evaluate the expression inside the event handler which mutates our state data
-# 6. Then we go through all the node tree looking for elements with x-bind attribute and update the node 
-
-
+# 3. Then we go through all the node tree looking for elements with x-bind attribute and update the node 
+# 4. Look for all the events in whole node tree and delegate that event so that all event is captured
+# 5. After each event we evaluate the expression inside the event handler which mutates our state data and again repeat from  step 3
 */
 
 export function evalString(expression, scope, event) {
