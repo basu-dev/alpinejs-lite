@@ -76,11 +76,8 @@
         },
         addTodo(){
             if(this.name.length<1)return;
-            setTimeout(() => {
             this.incompleteTodos.push(this.name);
             this.name="";
-            this.$$update();
-            },2000);
         },
         markDone(e){
             console.log(e);
