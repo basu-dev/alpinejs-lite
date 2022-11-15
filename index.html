@@ -5,64 +5,21 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpine Clone</title>
+    <meta name="description" content="Todo application built with alpinejs clone.">
+    <meta name="keywords" content="Basu Dev Adhikari, alpine, alpinejs clone, todo">
+    <meta name="author" content="Basu Dev Adhikari">
+    <title>Alpine Clone Todo Application</title>
+    <link rel="stylesheet" href="./assets/style.css">
 </head>
-<style>
-    img {
-        height: 225px;
-        background-color: #111;
-    }
-
-    html {
-        font-size: 20px;
-    }
-
-    .red {
-        color: red;
-    }
-
-    input[type=number],
-    input[type="text"] {
-
-        min-width: 250px;
-    }
-
-    input[type=text],
-    input[type=number],
-    button {
-        padding: .5rem;
-        border-radius: 5px;
-    }
-
-    button {
-        cursor: pointer;
-        border-color: red;
-        min-width: 100px;
-    }
-
-    .grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-    }
-
-    ol {
-        padding: 0;
-    }
-
-    li {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        padding: .5rem;
-        border-bottom: 1px solid #eaeaea;
-    }
-</style>
-<h1>Todo Manager</h1>
 
 <body>
-    <div x-data='{
+    <nav>
+        <h1>Todo Manager</h1>
+        <a target="_blank" href="https://github.com/basu-dev/alpinejs-clone">
+            <img src="./assets/github.png" height="50">
+        </a>
+    </nav>
+    <main x-data='{
         name:"",
         // This event will be added while todos are added
         $futureEvents:["change"],
@@ -100,7 +57,6 @@
         }
     }'>
 
-
         <input type="text" minlength="2" maxlength="3" x-bind:value="imageWidth" placeholder="Enter Image Width"
             x-on:input="imageWidth=$event.target.value">
         <button x-bind:disabled="imageWidth.length==0" x-on:click="changeImage()">Change Image</button>
@@ -110,12 +66,14 @@
         <br />
         <br />
 
-        <input type="text" x-bind:value="name" placeholder="Todo Name" x-on:input="name=$event.target.value">
+        <input type="text" x-bind:value="name" placeholder="Todo Title" x-on:input="name=$event.target.value">
         <button x-bind:disabled="name.length==0" x-on:click="addTodo()">Add Todo</button>
+        <br>
         <br>
         <section class="grid">
             <aside>
                 <h3>Incomplete Todos</h3>
+                <br>
                 <ol x-bind:html="incompleteTodos.map((todo,index)=>(`
                     <li>
                         <span>${todo}</span>
@@ -125,6 +83,7 @@
             </aside>
             <aside>
                 <h3>Completed Todos</h3>
+                <br>
                 <ol x-bind:html="completedTodos.map((todo,index)=>(`
                     <li>
                         <span>${todo}</span>
@@ -133,6 +92,11 @@
                     `)).join('')"></ol>
             </aside>
         </section>
+    </main>
+
+    <div class="info">
+        This todo application is built with my <a target="_blank"
+            href="https://github.com/basu-dev/alpinejs-clone">alpinejs clone</a> library
     </div>
 
     <script type="module" src="./src/index.js"></script>
