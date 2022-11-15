@@ -8,20 +8,36 @@
     <title>Alpine Clone</title>
 </head>
 <style>
+    img {
+        height: 225px;
+        background-color: #111;
+    }
+
     html {
         font-size: 20px;
     }
 
+    .red {
+        color: red;
+    }
+
+    input[type=number],
+    input[type="text"] {
+
+        min-width: 250px;
+    }
+
     input[type=text],
+    input[type=number],
     button {
         padding: .5rem;
-        min-width: 250px;
         border-radius: 5px;
     }
 
     button {
         cursor: pointer;
-        border: none;
+        border-color: red;
+        min-width: 100px;
     }
 
     .grid {
@@ -49,36 +65,54 @@
     <div x-data='{
         name:"",
         // This event will be added while todos are added
-        $moreEvents:["change"],
+        $futureEvents:["change"],
         incompleteTodos:[],
         completedTodos:[],
+        imageWidth:"400",
+        src:"https://picsum.photos/400/225",
         init(){
             fetch("https://jsonplaceholder.typicode.com/todos")
             .then(data=>data.json()).then(
                 data=>{
-                    data.length=10;
+                    data.length=4;
                     this.incompleteTodos = data.map(d=>d.title);
-               this.$$update(); 
                 }
             ).catch()
         },
         addTodo(){
             if(this.name.length<1)return;
-            this.incompleteTodos.push(this.name);
+            this.incompleteTodos = [...this.incompleteTodos,this.name];
             this.name="";
+        },
+        changeImage(){
+            let height = parseInt(this.imageWidth);
+            width = Math.floor((19/8) * height);
+            this.src= `https://picsum.photos/${width}/${height}`
         },
         markDone(index){
             let todo = this.incompleteTodos.splice(index,1);
-            this.completedTodos.push(todo);
+            this.incompleteTodos = [...this.incompleteTodos];
+            this.completedTodos = [...this.completedTodos,todo];
         },
         removeTodo(index){
             this.completedTodos.splice(index,1);
+            this.completedTodos = [...this.completedTodos];
         }
     }'>
+
+
+        <input type="text" minlength="2" maxlength="3" x-bind:value="imageWidth" placeholder="Enter Image Width"
+            x-on:input="imageWidth=$event.target.value">
+        <button x-bind:disabled="imageWidth.length==0" x-on:click="changeImage()">Change Image</button>
+        <br>
+        <br>
+        <img x-bind:src="src">
+        <br />
+        <br />
+
         <input type="text" x-bind:value="name" placeholder="Todo Name" x-on:input="name=$event.target.value">
-        <br />
-        <br />
-        <button x-on:click="addTodo()">Add</button>
+        <button x-bind:disabled="name.length==0" x-on:click="addTodo()">Add Todo</button>
+        <br>
         <section class="grid">
             <aside>
                 <h3>Incomplete Todos</h3>
@@ -100,7 +134,6 @@
             </aside>
         </section>
     </div>
-
 
     <script type="module" src="./src/index.js"></script>
 
