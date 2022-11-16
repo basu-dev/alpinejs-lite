@@ -72,7 +72,11 @@
         <br>
         <section class="grid">
             <aside>
-                <h3>Incomplete Todos</h3>
+                <h3>Incomplete Todos
+                    <template x-bind:if="incompleteTodos.length">
+                        <span x-bind:text="`(`+incompleteTodos.length+`)`"></span>
+                    </template>
+                </h3>
                 <br>
                 <ol x-bind:html="incompleteTodos.map((todo,index)=>(`
                     <li>
@@ -82,7 +86,11 @@
                     `)).join('')"></ol>
             </aside>
             <aside>
-                <h3>Completed Todos</h3>
+                <h3>Completed Todos
+                    <template x-bind:if="completedTodos.length">
+                        <span x-bind:text="`(`+completedTodos.length+`)`"></span>
+                    </template>
+                </h3>
                 <br>
                 <ol x-bind:html="completedTodos.map((todo,index)=>(`
                     <li>
@@ -92,6 +100,7 @@
                     `)).join('')"></ol>
             </aside>
         </section>
+
     </main>
 
     <div class="info">
