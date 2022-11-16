@@ -9,6 +9,7 @@ import {
   handleBooleanAttributes,
   handleClass,
   handleHtml,
+  handleIf,
   handleText,
   handleValue,
 } from "./handle.js";
@@ -56,7 +57,6 @@ class Component {
   }
 
   updateDOM(modifiedProps = []) {
-    console.log("updating");
     // Get all x-bind related attributes and update according to the expression provided
     walk(this.$el, (element) => {
       let attrTypes = getXAttributes(element, "bind");
@@ -90,11 +90,9 @@ class Component {
       case "checked":
         handleBooleanAttributes(booleanObj);
         break;
-
       case "src":
         handleBindings(booleanObj);
         break;
-
       case "value":
         handleValue(commonObj);
         break;
@@ -106,6 +104,9 @@ class Component {
         break;
       case "class":
         handleClass(commonObj);
+        break;
+      case "if":
+        handleIf(commonObj);
         break;
     }
   }
