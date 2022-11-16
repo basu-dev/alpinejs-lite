@@ -22,11 +22,12 @@
     <main x-data='{
         name:"",
         // This event will be added while todos are added
-        $futureEvents:["change"],
+        $futureEvents:["change","load"],
         incompleteTodos:[],
         completedTodos:[],
         imageWidth:"",
-        src:"https://picsum.photos/400/225",
+        loadingImage:false,
+        src:"https://picsum.photos/534/225.webp",
         init(){
             fetch("https://jsonplaceholder.typicode.com/todos")
             .then(data=>data.json()).then(
@@ -35,6 +36,10 @@
                     this.incompleteTodos = data.map(d=>d.title);
                 }
             ).catch()
+            document.getElementById("change-img").addEventListener("load",()=>{
+                console.log("loaded");
+                this.loadingImage=false;
+            });
         },
         addTodo(){
             if(this.name.length<1)return;
@@ -42,9 +47,10 @@
             this.name="";
         },
         changeImage(){
-            let height = parseInt(this.imageWidth);
+            let height =  Math.floor(Math.random() * (500 - 300 + 1) + 300);
             width = Math.floor((19/8) * height);
-            this.src= `https://picsum.photos/${width}/${height}`
+            this.src= `https://picsum.photos/${width}/${height}.webp`
+            this.loadingImage=true;
         },
         markDone(index){
             let todo = this.incompleteTodos.splice(index,1);
@@ -57,12 +63,14 @@
         }
     }'>
 
-        <input type="text" minlength="2" maxlength="3" x-bind:value="imageWidth" placeholder="Enter Image Width"
-            x-on:input="imageWidth=$event.target.value">
-        <button x-bind:disabled="imageWidth.length==0" x-on:click="changeImage()">Change Image</button>
+        <button x-on:click="changeImage()">View Another Image</button>
+        <template x-bind:if="loadingImage">
+            <small> Loading...</small>
+        </template>
         <br>
         <br>
-        <img x-bind:src="src">
+        <img id="change-img" x-bind:src="src">
+
         <br />
         <br />
 

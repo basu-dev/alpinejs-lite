@@ -38,6 +38,8 @@ nav img:hover{
     main img {
         height: 225px;
         border-radius: 5px;
+        max-width: 100%;
+        object-fit: cover;
     }
 
 
