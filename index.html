@@ -52,13 +52,17 @@
             this.loadingImage=true;
         },
         markDone(index){
+            setTimeout(()=>{
             let todo = this.incompleteTodos.splice(index,1);
             this.incompleteTodos = [...this.incompleteTodos];
             this.completedTodos = [...this.completedTodos,todo];
+            },300)
         },
         removeTodo(index){
+            setTimeout(()=>{
             this.completedTodos.splice(index,1);
             this.completedTodos = [...this.completedTodos];
+            },300)
         }
     }'>
 
