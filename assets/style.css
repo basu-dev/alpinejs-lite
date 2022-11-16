@@ -1,0 +1,54 @@
+
+    img {
+        height: 225px;
+        background-color: #111;
+    }
+
+    html {
+        font-size: 20px;
+    }
+
+    .red {
+        color: red;
+    }
+
+    input[type=number],
+    input[type="text"] {
+
+        min-width: 250px;
+    }
+
+    input[type=text],
+    input[type=number],
+    button {
+        padding: .5rem;
+        border-radius: 5px;
+    }
+    input[type=checkbox]{
+        cursor: pointer;
+    }
+
+    button {
+        cursor: pointer;
+        border-color: red;
+        min-width: 100px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    ol {
+        padding: 0;
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: .5rem;
+        border-bottom: 1px solid #eaeaea;
+    }

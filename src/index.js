@@ -1,9 +1,11 @@
 /*
-# 1. Look for all the elements in dom having x-data attribute and initialize component for each element
-# 2. Parse the data provided as string to x-data attribute and convert it to object ( Most crucial part)
-3. Update the Dom with the data state
-4. Listen for events in the DOM tree
+## Algorithm
+1. Look for all the elements in dom having x-data attribute and initialize component for each element (Done at last line of this page)
+2. Parse the data provided as string to x-data attribute and convert it to JavaScript object (data state) ( Most crucial part)
+3. Update the DOM with the data state
+4. Look for 'x-on' attributes, collect all the possible events and add all those events on the host element (event delegation)
 */
+
 import {
   handleBindings,
   handleBooleanAttributes,
@@ -17,72 +19,43 @@ import { evalString, getXAttributes, getXBindType, walk } from "./helper.js";
 class Component {
   constructor(el) {
     this.$el = el;
-    this.$data = this.proxify(evalString(this.$el.getAttribute("x-data"), {}));
+    // Get x-data value from html tag and convert it to JavaScript object.
+    this.$data = evalString(this.$el.getAttribute("x-data"), {});
     this.initialize();
     this.updateDOM();
     this.registerEvents();
-    this.$startProxyUpdate = true;
-  }
-
-  proxify(object) {
-    let self = this;
-    let props = [];
-    let modifier = {
-      set(obj, prop, value) {
-        obj[prop] = value;
-        if (self.$startProxyUpdate) {
-          props.push(prop);
-          // This queueMicrotask is used so that if two props are changed by one action, two updateDOM method is not called
-          queueMicrotask(() => {
-            if (props.length == 0) return;
-            self.updateDOM(props);
-            props.length = 0;
-          });
-        }
-        return true;
-      },
-    };
-    return new Proxy(object, modifier);
   }
 
   initialize() {
-    // Provide update api to the user in case of async data
-    this.$data.$$update = this.updateDOM.bind(this);
+    // Provide update api to the user in case of async data like api call, setTimeout, Promise etc.
+    // this will not be needed in future with use of proxy
+    this.$data.$update = this.updateDOM.bind(this);
 
-    // Call init method if provided
+    // Call init method if provided by user
     if (this.$data.init && typeof this.$data.init == "function") {
       this.$data.init();
     }
   }
 
-  updateDOM(modifiedProps = []) {
-    console.log("updating");
+  updateDOM() {
     // Get all x-bind related attributes and update according to the expression provided
     walk(this.$el, (element) => {
-      let attrTypes = getXAttributes(element, "bind");
+      let attrTypes = getXAttributes(element, "bind"); // returns array like ['x-bind:text','x-bind:class','x-bind:value']
       if (attrTypes.length == 0) return;
-      attrTypes.forEach((attrType) =>
-        this.handleAttributes(element, attrType, { modifiedProps })
-      );
+
+      // We will update element as evaluating the expression inside each x-bind (attrTypes)
+      attrTypes.forEach((attrType) => this.handleAttributes(element, attrType));
     });
   }
 
-  shouldEvaluateExpression(modifiedProps, expression) {
-    if (!this.$startProxyUpdate) return true;
-    if (modifiedProps.length == 0) return false;
-    let truth = modifiedProps.some((prop) => expression.includes(prop));
-    return truth;
-  }
-
-  handleAttributes(element, attrType, { modifiedProps } = data) {
-    let expression = element.getAttribute(attrType);
-    if (!this.shouldEvaluateExpression(modifiedProps, expression)) return;
-    let attr = getXBindType(attrType);
+  handleAttributes(element, attrType) {
+    // let the element has x-bind:value="expression_here"
+    let expression = element.getAttribute(attrType); // returns "expression_here" in string form
+    let attr = getXBindType(attrType); // returns 'value' from "x-bind:value" by splitting text 'x-bind:value'
     let commonObj = {
       element,
       expression,
       data: this.$data,
-      modifiedProps,
     };
     let booleanObj = Object.assign({ attr }, commonObj);
     switch (attr) {
@@ -90,11 +63,9 @@ class Component {
       case "checked":
         handleBooleanAttributes(booleanObj);
         break;
-
       case "src":
         handleBindings(booleanObj);
         break;
-
       case "value":
         handleValue(commonObj);
         break;
@@ -119,7 +90,10 @@ class Component {
       xOnAttrs = [...xOnAttrs, ...onAttrs];
     });
 
-    // Adding any future events as well
+    // Here xOnAttrs will become something like ["x-on:click","x-on:input","x-on:change"]
+
+    // Adding any future events if provided by user
+    // User can provide it like this.$futureEvents = ['change'] so we have to change 'change' to "x-on:change" and add it to array
     if (this.$data.$futureEvents && Array.isArray(this.$data.$futureEvents)) {
       xOnAttrs = [
         ...xOnAttrs,
@@ -127,20 +101,30 @@ class Component {
       ];
     }
 
+    // remove duplicate with new Set() like if we have two "x-on:click", we don't want to add two click event listeners on host element
+    xOnAttrs = [...new Set(xOnAttrs)];
+
+    // Here we have collected many unique x-on attributes
     xOnAttrs.forEach((type) => this.handleListener(type));
   }
 
   handleListener(type) {
-    let eventType = getXBindType(type);
+    // type contains string like "x-on:click"
+    let eventType = getXBindType(type); // return "click" after splitting "x-on:" from the "x-on:click" so we add click event listener on host element
+    // Remember we do not add eventListener on each element but on host element so that events after bubbling up are captured at host element
     this.$el.addEventListener(eventType, (event) => {
+      // These below 4 lines of code verify if the "click" event is coming from element having "x-on:click" attribute
+      // If it is not coming from that element, we return
       let el = event.target;
       let onAttrs = getXAttributes(el, "on");
 
       if (onAttrs.length == 0) return;
       if (!onAttrs.some((attr) => attr.includes(type))) return;
 
+      // Here we get the expression from target element which is clicked and evaluate it and updateDOM
       let expression = el.getAttribute(type);
       evalString(expression, this.$data, event);
+      this.updateDOM();
     });
   }
 }
