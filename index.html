@@ -108,18 +108,14 @@
                     </template>
                 </h3>
                 <br>
-                <template x-bind:for="todo in completedTodos">
-                    <ol>
-                        <template x-bind:for="todo in completedTodos">
-                            <div x-bind:text="todo"></div>
-
-                            <li>
-                                <span x-bind:text="todo"></span>
-                                <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
-                            </li>
-                        </template>
-                    </ol>
-                </template>
+                <ol>
+                    <template x-bind:for="todo in completedTodos">
+                        <li>
+                            <span x-bind:text="todo"></span>
+                            <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
+                        </li>
+                    </template>
+                </ol>
             </aside>
         </section>
     </main>
