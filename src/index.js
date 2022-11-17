@@ -13,15 +13,23 @@ import {
   handleText,
   handleValue,
 } from "./handle.js";
-import { evalString, getXAttributes, getXBindType, walk } from "./helper.js";
+import { handleFor } from "./handleFor.js";
+import {
+  appendXDataToElement,
+  evalString,
+  getXAttributes,
+  getXBindType,
+  getXData,
+  walk,
+} from "./helper.js";
 
 class Component {
   constructor(el) {
     this.$el = el;
-    this.$data = this.proxify(evalString(this.$el.getAttribute("x-data"), {}));
+    this.$state = this.proxify(evalString(this.$el.getAttribute("x-data")));
     this.initialize();
-    this.updateDOM();
-    this.registerEvents();
+    this.updateNodeBindings({ hostElement: this.$el, state: this.$state });
+    this.registerEvents({ delegateTo: this.$el, state: this.$state });
     this.$startProxyUpdate = true;
   }
 
@@ -33,10 +41,14 @@ class Component {
         obj[prop] = value;
         if (self.$startProxyUpdate) {
           props.push(prop);
-          // This queueMicrotask is used so that if two props are changed by one action, two updateDOM method is not called
+          // This queueMicrotask is used so that if two props are changed by one action, two updateNodeBindings method is not called
           queueMicrotask(() => {
+            // Sometimes value is nothing. so need to check that as well. I dont know why
             if (props.length == 0) return;
-            self.updateDOM(props);
+            self.updateNodeBindings(
+              { hostElement: self.$el, state: self.$state },
+              props
+            );
             props.length = 0;
           });
         }
@@ -47,41 +59,48 @@ class Component {
   }
 
   initialize() {
-    // Provide update api to the user in case of async data
-    this.$data.$$update = this.updateDOM.bind(this);
-
     // Call init method if provided
-    if (this.$data.init && typeof this.$data.init == "function") {
-      this.$data.init();
+    if (this.$state.init && typeof this.$state.init == "function") {
+      this.$state.init();
     }
   }
 
-  updateDOM(modifiedProps = []) {
+  updateNodeBindings({ hostElement } = data, modifiedProps = []) {
     // Get all x-bind related attributes and update according to the expression provided
-    walk(this.$el, (element) => {
+    walk(hostElement, (element) => {
       let attrTypes = getXAttributes(element, "bind");
       if (attrTypes.length == 0) return;
+      this.addXDataForElement(element);
       attrTypes.forEach((attrType) =>
         this.handleAttributes(element, attrType, { modifiedProps })
       );
     });
   }
 
-  shouldEvaluateExpression(modifiedProps, expression) {
+  addXDataForElement(element) {
+    if (getXData(element).length == 0) {
+      appendXDataToElement(element, this.$state);
+    }
+  }
+
+  shouldEvaluateExpression(modifiedProps, expression, attrType) {
+    // todo: remove this and solve for x-for update
+    if (attrType == "x-bind:text") return true;
     if (!this.$startProxyUpdate) return true;
-    if (modifiedProps.length == 0) return false;
     let truth = modifiedProps.some((prop) => expression.includes(prop));
     return truth;
   }
 
   handleAttributes(element, attrType, { modifiedProps } = data) {
     let expression = element.getAttribute(attrType);
-    if (!this.shouldEvaluateExpression(modifiedProps, expression)) return;
+    if (!this.shouldEvaluateExpression(modifiedProps, expression, attrType))
+      return;
+
     let attr = getXBindType(attrType);
     let commonObj = {
       element,
       expression,
-      data: this.$data,
+      self: this,
     };
     let booleanObj = Object.assign({ attr }, commonObj);
     switch (attr) {
@@ -107,32 +126,37 @@ class Component {
       case "if":
         handleIf(commonObj);
         break;
+      case "for":
+        handleFor(commonObj);
+        break;
     }
   }
 
-  registerEvents() {
+  registerEvents({ delegateTo }) {
     // List out all the possible events that would occur in the html and add listener only on root element, called event delegation
     let xOnAttrs = [];
     walk(this.$el, (element) => {
+      this.addXDataForElement(element);
       let onAttrs = getXAttributes(element, "on");
       if (onAttrs.length == 0) return;
       xOnAttrs = [...xOnAttrs, ...onAttrs];
     });
 
     // Adding any future events as well
-    if (this.$data.$futureEvents && Array.isArray(this.$data.$futureEvents)) {
+    if (this.$state.$futureEvents && Array.isArray(this.$state.$futureEvents)) {
       xOnAttrs = [
         ...xOnAttrs,
-        ...this.$data.$futureEvents.map((type) => `x-on:${type}`),
+        ...this.$state.$futureEvents.map((type) => `x-on:${type}`),
       ];
     }
+    xOnAttrs = [...new Set(xOnAttrs)];
 
-    xOnAttrs.forEach((type) => this.handleListener(type));
+    xOnAttrs.forEach((type) => this.handleListener(type, { delegateTo }));
   }
 
-  handleListener(type) {
+  handleListener(type, { delegateTo }) {
     let eventType = getXBindType(type);
-    this.$el.addEventListener(eventType, (event) => {
+    delegateTo.addEventListener(eventType, (event) => {
       let el = event.target;
       let onAttrs = getXAttributes(el, "on");
 
@@ -140,7 +164,7 @@ class Component {
       if (!onAttrs.some((attr) => attr.includes(type))) return;
 
       let expression = el.getAttribute(type);
-      evalString(expression, this.$data, event);
+      evalString(expression, el._x__data, { $event: event });
     });
   }
 }

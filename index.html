@@ -22,8 +22,8 @@
     <main x-data='{
         name:"",
         // This event will be added while todos are added
-        $futureEvents:["change","load"],
-        incompleteTodos:[],
+        $futureEvents:["change"],
+        incompleteTodos:["First Todo","Second Todo","Third Todo"],
         completedTodos:[],
         imageWidth:"",
         loadingImage:false,
@@ -52,6 +52,7 @@
             this.loadingImage=true;
         },
         markDone(index){
+            if(index==-1)return;
             setTimeout(()=>{
             let todo = this.incompleteTodos.splice(index,1);
             this.incompleteTodos = [...this.incompleteTodos];
@@ -81,6 +82,7 @@
         <button x-bind:disabled="name.length==0" x-on:click="addTodo()">Add Todo</button>
         <br>
         <br>
+
         <section class="grid">
             <aside>
                 <h3>Incomplete Todos
@@ -88,14 +90,17 @@
                         <span x-bind:text="`(`+incompleteTodos.length+`)`"></span>
                     </template>
                 </h3>
-                <br>
-                <ol x-bind:html="incompleteTodos.map((todo,index)=>(`
-                    <li>
-                        <span>${todo}</span>
-                        <input  type='checkbox' x-on:change='markDone(${index})'>
-                    </li>
-                    `)).join('')"></ol>
+                <br />
+                <ol>
+                    <template x-bind:for="todo in incompleteTodos">
+                        <li>
+                            <span x-bind:text="todo"></span>
+                            <input type='checkbox' x-on:change="markDone(incompleteTodos.indexOf(todo))">
+                        </li>
+                    </template>
+                </ol>
             </aside>
+
             <aside>
                 <h3>Completed Todos
                     <template x-bind:if="completedTodos.length">
@@ -103,15 +108,20 @@
                     </template>
                 </h3>
                 <br>
-                <ol x-bind:html="completedTodos.map((todo,index)=>(`
-                    <li>
-                        <span>${todo}</span>
-                        <input type='checkbox' x-on:change='removeTodo(${index})'>
-                    </li>
-                    `)).join('')"></ol>
+                <template x-bind:for="todo in completedTodos">
+                    <ol>
+                        <template x-bind:for="todo in completedTodos">
+                            <div x-bind:text="todo"></div>
+
+                            <li>
+                                <span x-bind:text="todo"></span>
+                                <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
+                            </li>
+                        </template>
+                    </ol>
+                </template>
             </aside>
         </section>
-
     </main>
 
     <div class="info">
