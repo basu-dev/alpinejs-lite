@@ -1,26 +1,59 @@
+import { handleFor } from "./handleFor.js";
 import { evalString } from "./helper.js";
 
-export function handleValue({ element, expression }) {
+export function handleAttributeByType(attr, { element, expression, self }) {
+  let commonObj = { element, expression, self };
+  let booleanObj = Object.assign({ attr }, commonObj);
+  switch (attr) {
+    case "disabled":
+    case "checked":
+      handleBooleanAttributes(booleanObj);
+      break;
+    case "src":
+      handleBindings(booleanObj);
+      break;
+    case "value":
+      handleValue(commonObj);
+      break;
+    case "text":
+      handleText(commonObj);
+      break;
+    case "html":
+      handleHtml(commonObj);
+      break;
+    case "class":
+      handleClass(commonObj);
+      break;
+    case "if":
+      handleIf(commonObj);
+      break;
+    case "for":
+      handleFor(commonObj);
+      break;
+  }
+}
+
+function handleValue({ element, expression }) {
   element.value = evalString(expression, element._x__data);
 }
 
-export function handleText({ element, expression }) {
+function handleText({ element, expression }) {
   element.innerText = evalString(expression, element._x__data);
 }
 
-export function handleHtml({ element, expression }) {
+function handleHtml({ element, expression }) {
   element.innerHTML = evalString(expression, element._x__data);
 }
 
-export function handleBooleanAttributes({ attr, element, expression }) {
+function handleBooleanAttributes({ attr, element, expression }) {
   element[attr] = evalString(expression, element._x__data);
 }
 
-export function handleBindings({ attr, element, expression }) {
+function handleBindings({ attr, element, expression }) {
   element[attr] = evalString(expression, element._x__data);
 }
 
-export function handleIf({ element, expression }) {
+function handleIf({ element, expression }) {
   // We will get the first child from template
   let _template = element.content.cloneNode(true);
   let requiredElement = _template.children[0];
@@ -40,7 +73,7 @@ export function handleIf({ element, expression }) {
   element.after(requiredElement);
 }
 
-export function handleClass({ element, expression }) {
+function handleClass({ element, expression }) {
   let reflectAttr = "x-class-reflect";
   let className = evalString(expression, element._x__data);
   // If className is returned by expression we add that class to the element's classList

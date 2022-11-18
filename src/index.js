@@ -4,16 +4,7 @@
 3. Update the Dom with the data state
 4. Listen for events in the DOM tree
 */
-import {
-  handleBindings,
-  handleBooleanAttributes,
-  handleClass,
-  handleHtml,
-  handleIf,
-  handleText,
-  handleValue,
-} from "./handle.js";
-import { handleFor } from "./handleFor.js";
+import { handleAttributeByType } from "./handle.js";
 import {
   appendXDataToElement,
   evalString,
@@ -22,6 +13,7 @@ import {
   getXData,
   walk,
 } from "./helper.js";
+import { handleListener } from "./registerEvents.js";
 
 class Component {
   constructor(el) {
@@ -36,14 +28,22 @@ class Component {
   proxify(object) {
     let self = this;
     let props = [];
+    // This modifier defines setter for each property of the state, so if any one of the prop changes, it fires updateNodeBinding method
+    // with the prop that has changed, so that element with unchanged prop would not be updated
     let modifier = {
       set(obj, prop, value) {
+        // If value has not changed, we need not to call update
+        if (obj[prop] && obj[prop] == value) return;
+
         obj[prop] = value;
+
+        // $startProxyUpdate is set to true, once all the element attributes are updated with initial state, then updating of
+        // nodes is done through here
         if (self.$startProxyUpdate) {
           props.push(prop);
           // This queueMicrotask is used so that if two props are changed by one action, two updateNodeBindings method is not called
+          // we collect all the props that are changed and fire updateNodeBindings method with array of those props
           queueMicrotask(() => {
-            // Sometimes value is nothing. so need to check that as well. I dont know why
             if (props.length == 0) return;
             self.updateNodeBindings(
               { hostElement: self.$el, state: self.$state },
@@ -52,6 +52,7 @@ class Component {
             props.length = 0;
           });
         }
+
         return true;
       },
     };
@@ -102,34 +103,8 @@ class Component {
       expression,
       self: this,
     };
-    let booleanObj = Object.assign({ attr }, commonObj);
-    switch (attr) {
-      case "disabled":
-      case "checked":
-        handleBooleanAttributes(booleanObj);
-        break;
-      case "src":
-        handleBindings(booleanObj);
-        break;
-      case "value":
-        handleValue(commonObj);
-        break;
-      case "text":
-        handleText(commonObj);
-        break;
-      case "html":
-        handleHtml(commonObj);
-        break;
-      case "class":
-        handleClass(commonObj);
-        break;
-      case "if":
-        handleIf(commonObj);
-        break;
-      case "for":
-        handleFor(commonObj);
-        break;
-    }
+
+    handleAttributeByType(attr, commonObj);
   }
 
   registerEvents({ delegateTo }) {
@@ -151,21 +126,7 @@ class Component {
     }
     xOnAttrs = [...new Set(xOnAttrs)];
 
-    xOnAttrs.forEach((type) => this.handleListener(type, { delegateTo }));
-  }
-
-  handleListener(type, { delegateTo }) {
-    let eventType = getXBindType(type);
-    delegateTo.addEventListener(eventType, (event) => {
-      let el = event.target;
-      let onAttrs = getXAttributes(el, "on");
-
-      if (onAttrs.length == 0) return;
-      if (!onAttrs.some((attr) => attr.includes(type))) return;
-
-      let expression = el.getAttribute(type);
-      evalString(expression, el._x__data, { $event: event });
-    });
+    xOnAttrs.forEach((type) => handleListener(type, { delegateTo }));
   }
 }
 

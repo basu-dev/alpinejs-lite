@@ -17,7 +17,7 @@ export function walk(el, cb) {
   }
 }
 
-export const getXAttributes = (el, type) =>
+export const getXAttributes = (el, type = "") =>
   el.getAttributeNames().filter((attr) => attr.includes(`x-${type}`));
 
 export const getXBindType = (bindType) => bindType.split(":")[1];

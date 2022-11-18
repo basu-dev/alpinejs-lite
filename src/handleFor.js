@@ -1,4 +1,9 @@
-import { appendXDataToElement, evalString, walk } from "./helper.js";
+import {
+  appendXDataToElement,
+  evalString,
+  getXAttributes,
+  walk,
+} from "./helper.js";
 
 export function handleFor({ self, element, expression }) {
   // We will get the first child from template
@@ -41,8 +46,11 @@ function createSingleNode(
   let xForScope = {};
   xForScope[`${singleItemLabel}`] = singleItem;
   walk(requiredElement, (elem) => {
-    appendXDataToElement(elem, self.$state);
-    appendXDataToElement(elem, xForScope);
+    // Now the element will have two states to one from scope of x-for loop another global scope
+    if (getXAttributes(elem).length) {
+      appendXDataToElement(elem, self.$state);
+      appendXDataToElement(elem, xForScope);
+    }
   });
   return requiredElement;
 }
