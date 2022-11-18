@@ -103,17 +103,20 @@ class Component {
     appendXDataToElement(element, this.$state);
   }
 
-  shouldEvaluateExpression(modifiedProps, expression, attrType) {
+  shouldEvaluateExpression(modifiedProps, expression, element) {
     // todo: remove this and solve for x-for update
-    if (attrType == "x-bind:text") return true;
     if (!this.$startProxyUpdate) return true;
-    let truth = modifiedProps.some((prop) => expression.includes(prop));
+    let truth = modifiedProps.some(
+      (prop) =>
+        // todo: element._x__for_expression check remove and from handleFor.js as well
+        expression.includes(prop) || element._x__for_expression?.includes(prop)
+    );
     return truth;
   }
 
   handleAttributes(element, attrType, { modifiedProps } = data) {
     let expression = element.getAttribute(attrType);
-    if (!this.shouldEvaluateExpression(modifiedProps, expression, attrType))
+    if (!this.shouldEvaluateExpression(modifiedProps, expression, element))
       return;
 
     let attr = getXBindType(attrType);

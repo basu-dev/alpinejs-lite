@@ -20,7 +20,7 @@ export function handleFor({ self, element, expression }) {
   let collection = evalString(collectionLabel, element._x__data);
 
   let childNodes = collection.map((item, index) =>
-    createSingleNode(self, element, _template, itemLabel, item)
+    createSingleNode(self, element, _template, itemLabel, item, expression)
   );
 
   childNodes.reverse().forEach((childNode) => element.after(childNode));
@@ -31,7 +31,8 @@ function createSingleNode(
   element,
   _template,
   singleItemLabel,
-  singleItem
+  singleItem,
+  expression
 ) {
   let requiredElement = _template.cloneNode(true).children[0];
 
@@ -50,6 +51,8 @@ function createSingleNode(
     if (getXAttributes(elem).length) {
       appendXDataToElement(elem, self.$state);
       appendXDataToElement(elem, xForScope);
+      // todo: find another solution for this also in shouldEvaluateExpression() method in index.js page
+      elem._x__for_expression = expression;
     }
   });
   return requiredElement;
