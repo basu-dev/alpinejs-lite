@@ -4,13 +4,12 @@
 3. Update the Dom with the data state
 4. Listen for events in the DOM tree
 */
-import { handleAttributeByType } from "./handle.js";
+import { handleAttributeByType } from "./handle/handle.js";
 import {
   appendXDataToElement,
   evalString,
   getXAttributes,
   getXBindType,
-  getXData,
   walk,
 } from "./helper.js";
 import { handleListener } from "./registerEvents.js";
@@ -18,6 +17,7 @@ import { handleListener } from "./registerEvents.js";
 class Component {
   constructor(el) {
     this.$el = el;
+    el._x__component = this;
     this.$state = this.proxify(evalString(this.$el.getAttribute("x-data")));
     this.initialize();
     this.updateNodeBindings({ hostElement: this.$el, state: this.$state });
@@ -36,6 +36,9 @@ class Component {
         if (obj[prop] && obj[prop] == value) return;
 
         obj[prop] = value;
+        if (self.$el.id == "child") {
+          console.log(prop);
+        }
 
         // $startProxyUpdate is set to true, once all the element attributes are updated with initial state, then updating of
         // nodes is done through here
@@ -45,9 +48,9 @@ class Component {
           // we collect all the props that are changed and fire updateNodeBindings method with array of those props
           queueMicrotask(() => {
             if (props.length == 0) return;
-            self.updateNodeBindings(
-              { hostElement: self.$el, state: self.$state },
-              props
+            self.updateNodeBindings({ hostElement: self.$el }, props);
+            self.$children.forEach((child) =>
+              child.updateNodeBindings({ hostElement: child.$el }, props)
             );
             props.length = 0;
           });
@@ -60,18 +63,34 @@ class Component {
   }
 
   initialize() {
+    // nested components go here. It is used inside proxify to update child components
+    this.$children = [];
     // Call init method if provided
     if (this.$state.init && typeof this.$state.init == "function") {
       this.$state.init();
     }
+
+    // Now we add current state to all element's _x__data array
+    walk(this.$el, (element) => {
+      let xAttrs = getXAttributes(element);
+      if (xAttrs.length == 0) return;
+      this.addXDataForElement(element);
+    });
   }
 
   updateNodeBindings({ hostElement } = data, modifiedProps = []) {
     // Get all x-bind related attributes and update according to the expression provided
     walk(hostElement, (element) => {
       let attrTypes = getXAttributes(element, "bind");
+      let xDataAttr = getXAttributes(element, "data");
+      if (element !== hostElement && xDataAttr.length) {
+        if (!element._x__component) {
+          let child = new Component(element);
+          this.$children.push(child);
+        }
+        return { ignoreChildren: true };
+      }
       if (attrTypes.length == 0) return;
-      this.addXDataForElement(element);
       attrTypes.forEach((attrType) =>
         this.handleAttributes(element, attrType, { modifiedProps })
       );
@@ -79,9 +98,7 @@ class Component {
   }
 
   addXDataForElement(element) {
-    if (getXData(element).length == 0) {
-      appendXDataToElement(element, this.$state);
-    }
+    appendXDataToElement(element, this.$state);
   }
 
   shouldEvaluateExpression(modifiedProps, expression, attrType) {
@@ -111,7 +128,6 @@ class Component {
     // List out all the possible events that would occur in the html and add listener only on root element, called event delegation
     let xOnAttrs = [];
     walk(this.$el, (element) => {
-      this.addXDataForElement(element);
       let onAttrs = getXAttributes(element, "on");
       if (onAttrs.length == 0) return;
       xOnAttrs = [...xOnAttrs, ...onAttrs];
@@ -130,4 +146,5 @@ class Component {
   }
 }
 
-document.querySelectorAll("[x-data]").forEach((el) => new Component(el));
+let element = document.querySelector("[x-data]");
+new Component(element);

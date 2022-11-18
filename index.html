@@ -23,7 +23,7 @@
         name:"Hello",
         // This event will be added while todos are added
         $futureEvents:["change"],
-        incompleteTodos:["First Todo","Second Todo","Third Todo"],
+        incompleteTodos:[],
         completedTodos:[],
         imageWidth:"",
         loadingImage:false,
@@ -82,6 +82,11 @@
         <button x-bind:disabled="name.length==0" x-on:click="addTodo()">Add Todo</button>
         <br>
         <br>
+        <div x-data="{hello:'world'}" id="child">
+            <input x-bind:value="name" x-on:input="name=$event.target.value" type="text">
+            <div x-bind:text="hello" id="child-hello"></div>
+            <div x-bind:text="name" id="child-name"></div>
+        </div>
 
         <section class="grid">
             <aside>

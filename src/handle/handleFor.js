@@ -3,7 +3,7 @@ import {
   evalString,
   getXAttributes,
   walk,
-} from "./helper.js";
+} from "../helper.js";
 
 export function handleFor({ self, element, expression }) {
   // We will get the first child from template

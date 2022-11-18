@@ -9,8 +9,16 @@ export const evalString = (expression, dataList = [{}], extras = {}) => {
 };
 
 export function walk(el, cb) {
-  cb(el);
-  let nextElement = el.firstElementChild;
+  let action = cb(el);
+  // if user wants to not walk the children and go directly to siblings, he has to return {ignoreChildren:true}
+  // this is used as one component should not walk down inside another component's nodes
+  let nextElement;
+  if (action && action.ignoreChildren) {
+    nextElement = el.nextElementSibling;
+  } else {
+    nextElement = el.firstElementChild;
+  }
+
   while (nextElement) {
     walk(nextElement, cb);
     nextElement = nextElement.nextElementSibling;

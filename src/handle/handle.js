@@ -1,5 +1,6 @@
+import { evalString } from "../helper.js";
 import { handleFor } from "./handleFor.js";
-import { evalString } from "./helper.js";
+import { handleIf } from "./handleIf.js";
 
 export function handleAttributeByType(attr, { element, expression, self }) {
   let commonObj = { element, expression, self };
@@ -51,26 +52,6 @@ function handleBooleanAttributes({ attr, element, expression }) {
 
 function handleBindings({ attr, element, expression }) {
   element[attr] = evalString(expression, element._x__data);
-}
-
-function handleIf({ element, expression }) {
-  // We will get the first child from template
-  let _template = element.content.cloneNode(true);
-  let requiredElement = _template.children[0];
-
-  // We will check if the element is already added after template tag,
-  // if  element is already we remove and check the expression to be true or not
-  if (element.__x_sibling) {
-    element.__x_sibling.remove();
-    element.__x_sibling = null;
-  }
-  let truth = evalString(expression, element._x__data);
-  // If the expression results true, we add the element after template tag and set
-  // __x_sibling as the added element, so that we can remove that later ( like done in above lines)
-
-  if (!truth) return;
-  element.__x_sibling = requiredElement;
-  element.after(requiredElement);
 }
 
 function handleClass({ element, expression }) {
