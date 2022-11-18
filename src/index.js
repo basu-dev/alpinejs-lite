@@ -1,5 +1,5 @@
 /*
-# 1. Look for all the elements in dom having x-data attribute and initialize component for each element
+# 1. Look for the element in dom having x-data attribute and initialize component for that element
 # 2. Parse the data provided as string to x-data attribute and convert it to object ( Most crucial part)
 3. Update the Dom with the data state
 4. Listen for events in the DOM tree
@@ -18,12 +18,14 @@ class Component {
   constructor(el) {
     this.$el = el;
     el._x__component = this;
+
     let expression = this.$el.getAttribute("x-data");
     if (expression) {
       this.$state = this.proxify(evalString(expression));
     } else {
       this.$state = {};
     }
+
     this.initialize();
     this.updateNodeBindings({ hostElement: this.$el, state: this.$state });
     this.registerEvents({ delegateTo: this.$el, state: this.$state });
@@ -33,6 +35,7 @@ class Component {
   proxify(object) {
     let self = this;
     let props = [];
+
     // This modifier defines setter for each property of the state, so if any one of the prop changes, it fires updateNodeBinding method
     // with the prop that has changed, so that element with unchanged prop would not be updated
     let modifier = {
@@ -46,6 +49,7 @@ class Component {
         // nodes is done through here
         if (self.$startProxyUpdate) {
           props.push(prop);
+
           // This queueMicrotask is used so that if two props are changed by one action, two updateNodeBindings method is not called
           // we collect all the props that are changed and fire updateNodeBindings method with array of those props
           queueMicrotask(() => {
@@ -57,7 +61,6 @@ class Component {
             props.length = 0;
           });
         }
-
         return true;
       },
     };
@@ -76,7 +79,8 @@ class Component {
     walk(this.$el, (element) => {
       let xAttrs = getXAttributes(element);
       if (xAttrs.length == 0) return;
-      this.addXDataForElement(element);
+
+      appendXDataToElement(element, this.$state);
     });
   }
 
@@ -97,10 +101,6 @@ class Component {
         this.handleAttributes(element, attrType, { modifiedProps })
       );
     });
-  }
-
-  addXDataForElement(element) {
-    appendXDataToElement(element, this.$state);
   }
 
   shouldEvaluateExpression(modifiedProps, expression, element) {
