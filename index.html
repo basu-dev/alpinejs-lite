@@ -12,9 +12,9 @@
     <link rel="stylesheet" href="./assets/style.css">
 </head>
 
-<body>
-    <nav>
-        <h1>Todo Manager</h1>
+<body x-data>
+    <nav x-data="{title:'Todo Manager'}">
+        <h1 x-bind:text="title"></h1>
         <a target="_blank" href="https://github.com/basu-dev/alpinejs-clone">
             <img src="./assets/github.png" height="50">
         </a>
@@ -82,11 +82,6 @@
         <button x-bind:disabled="name.length==0" x-on:click="addTodo()">Add Todo</button>
         <br>
         <br>
-        <div x-data="{hello:'world'}" id="child">
-            <input x-bind:value="name" x-on:input="name=$event.target.value" type="text">
-            <div x-bind:text="hello" id="child-hello"></div>
-            <div x-bind:text="name" id="child-name"></div>
-        </div>
 
         <section class="grid">
             <aside>
