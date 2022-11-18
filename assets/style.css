@@ -34,12 +34,17 @@ nav img{
 nav img:hover{
     background:rgb(255, 0, 0);
 }
+.image-section{
+    margin-bottom:1.5rem;
+}
 
-    main img {
+    .image-section img {
         height: 225px;
         border-radius: 5px;
         max-width: 100%;
         object-fit: cover;
+        margin-top:1rem;
+        display:block;
     }
 
 
@@ -73,10 +78,14 @@ nav img:hover{
         min-width: 100px;
     }
 
-    .grid {
+    .todo-grid {
+        margin-top:1rem;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
+    }
+    .todo-grid .grid-title{
+        margin-bottom:.5rem;
     }
 
     li {

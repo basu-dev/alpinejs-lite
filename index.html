@@ -12,111 +12,112 @@
     <link rel="stylesheet" href="./assets/style.css">
 </head>
 
-<body x-data>
-    <nav x-data="{title:'Todo Manager'}">
-        <h1 x-bind:text="title"></h1>
+<body>
+    <nav>
+        <h1>Todo Manager</h1>
         <a target="_blank" href="https://github.com/basu-dev/alpinejs-clone">
             <img src="./assets/github.png" height="50">
         </a>
     </nav>
-    <main x-data='{
-        name:"Hello",
-        // This event will be added while todos are added
-        $futureEvents:["change"],
-        incompleteTodos:[],
-        completedTodos:[],
-        imageWidth:"",
-        loadingImage:false,
-        src:"https://picsum.photos/534/225.webp",
-        init(){
-            fetch("https://jsonplaceholder.typicode.com/todos")
-            .then(data=>data.json()).then(
-                data=>{
-                    data.length=4;
-                    this.incompleteTodos = data.map(d=>d.title);
-                }
-            ).catch()
-            document.getElementById("change-img").addEventListener("load",()=>{
-                this.loadingImage=false;
-            });
-        },
-        addTodo(){
-            if(this.name.length<1)return;
-            this.incompleteTodos = [...this.incompleteTodos,this.name];
-            this.name="";
-        },
-        changeImage(){
-            let height =  Math.floor(Math.random() * (500 - 300 + 1) + 300);
-            width = Math.floor((19/8) * height);
-            this.src= `https://picsum.photos/${width}/${height}.webp`
-            this.loadingImage=true;
-        },
-        markDone(index){
-            if(index==-1)return;
-            setTimeout(()=>{
-            let todo = this.incompleteTodos.splice(index,1);
-            this.incompleteTodos = [...this.incompleteTodos];
-            this.completedTodos = [...this.completedTodos,todo];
-            },300)
-        },
-        removeTodo(index){
-            setTimeout(()=>{
-            this.completedTodos.splice(index,1);
-            this.completedTodos = [...this.completedTodos];
-            },300)
-        }
+
+    <main x-data>
+        <section class="image-section" x-data='{
+            imageWidth:"",
+            loadingImage:false,
+            src:"https://picsum.photos/534/225.webp",
+            init(){
+                document.getElementById("change-img").addEventListener("load",()=>{
+                    this.loadingImage=false;
+                });
+            },
+            changeImage(){
+                let height =  Math.floor(Math.random() * (500 - 300 + 1) + 300);
+                width = Math.floor((19/8) * height);
+                this.src= `https://picsum.photos/${width}/${height}.webp`
+                this.loadingImage=true;
+            }
+}'>
+            <button x-on:click="changeImage()">View Another Image</button>
+            <template x-bind:if="loadingImage">
+                <small> Loading...</small>
+            </template>
+
+            <img id="change-img" x-bind:src="src">
+        </section>
+
+        <section class="todo-section" x-data='{
+            name:"Hello",
+            // This event will be added while todos are added
+            $futureEvents:["change"],
+            incompleteTodos:[],
+            completedTodos:[],
+            init(){
+                fetch("https://jsonplaceholder.typicode.com/todos")
+                .then(data=>data.json()).then(
+                    data=>{
+                        data.length=4;
+                        this.incompleteTodos = data.map(d=>d.title);
+                    }
+                ).catch()
+            },
+            addTodo(){
+                if(this.name.length<1)return;
+                this.incompleteTodos = [...this.incompleteTodos,this.name];
+                this.name="";
+            },
+
+            markDone(index){
+                if(index==-1)return;
+                setTimeout(()=>{
+                let todo = this.incompleteTodos.splice(index,1);
+                this.incompleteTodos = [...this.incompleteTodos];
+                this.completedTodos = [...this.completedTodos,todo];
+                },300)
+            },
+            removeTodo(index){
+                setTimeout(()=>{
+                this.completedTodos.splice(index,1);
+                this.completedTodos = [...this.completedTodos];
+                },300)
+            }
     }'>
 
-        <button x-on:click="changeImage()">View Another Image</button>
-        <template x-bind:if="loadingImage">
-            <small> Loading...</small>
-        </template>
-        <br>
-        <br>
-        <img id="change-img" x-bind:src="src">
+            <input type="text" x-bind:value="name" placeholder="Todo Title" x-on:input="name=$event.target.value">
+            <button x-bind:disabled="name.length==0" x-on:click="addTodo()">Add Todo</button>
 
-        <br />
-        <br />
+            <section class="todo-grid">
+                <aside>
+                    <h3 class="grid-title">Incomplete Todos
+                        <template x-bind:if="incompleteTodos.length">
+                            <span x-bind:text="`(`+incompleteTodos.length+`)`"></span>
+                        </template>
+                    </h3>
+                    <ol>
+                        <template x-bind:for="todo in incompleteTodos">
+                            <li>
+                                <span x-bind:text="todo"></span>
+                                <input type='checkbox' x-on:change="markDone(incompleteTodos.indexOf(todo))">
+                            </li>
+                        </template>
+                    </ol>
+                </aside>
 
-        <input type="text" x-bind:value="name" placeholder="Todo Title" x-on:input="name=$event.target.value">
-        <button x-bind:disabled="name.length==0" x-on:click="addTodo()">Add Todo</button>
-        <br>
-        <br>
-
-        <section class="grid">
-            <aside>
-                <h3>Incomplete Todos
-                    <template x-bind:if="incompleteTodos.length">
-                        <span x-bind:text="`(`+incompleteTodos.length+`)`"></span>
-                    </template>
-                </h3>
-                <br />
-                <ol>
-                    <template x-bind:for="todo in incompleteTodos">
-                        <li>
-                            <span x-bind:text="todo"></span>
-                            <input type='checkbox' x-on:change="markDone(incompleteTodos.indexOf(todo))">
-                        </li>
-                    </template>
-                </ol>
-            </aside>
-
-            <aside>
-                <h3>Completed Todos
-                    <template x-bind:if="completedTodos.length">
-                        <span x-bind:text="`(`+completedTodos.length+`)`"></span>
-                    </template>
-                </h3>
-                <br>
-                <ol>
-                    <template x-bind:for="todo in completedTodos">
-                        <li>
-                            <span x-bind:text="todo"></span>
-                            <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
-                        </li>
-                    </template>
-                </ol>
-            </aside>
+                <aside>
+                    <h3 class="grid-title">Completed Todos
+                        <template x-bind:if="completedTodos.length">
+                            <span x-bind:text="`(`+completedTodos.length+`)`"></span>
+                        </template>
+                    </h3>
+                    <ol>
+                        <template x-bind:for="todo in completedTodos">
+                            <li>
+                                <span x-bind:text="todo"></span>
+                                <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
+                            </li>
+                        </template>
+                    </ol>
+                </aside>
+            </section>
         </section>
     </main>
 
