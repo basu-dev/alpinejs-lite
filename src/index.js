@@ -152,13 +152,6 @@ class Component {
       xOnAttrs = [...xOnAttrs, ...onAttrs];
     });
 
-    // Adding any future events as well
-    if (this.$state.$futureEvents && Array.isArray(this.$state.$futureEvents)) {
-      xOnAttrs = [
-        ...xOnAttrs,
-        ...this.$state.$futureEvents.map((type) => `x-on:${type}`),
-      ];
-    }
     xOnAttrs = [...new Set(xOnAttrs)];
 
     xOnAttrs.forEach((type) => handleListener(type, { delegateTo }));
