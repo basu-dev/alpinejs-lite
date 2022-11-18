@@ -18,7 +18,12 @@ class Component {
   constructor(el) {
     this.$el = el;
     el._x__component = this;
-    this.$state = this.proxify(evalString(this.$el.getAttribute("x-data")));
+    let expression = this.$el.getAttribute("x-data");
+    if (expression) {
+      this.$state = this.proxify(evalString(expression));
+    } else {
+      this.$state = {};
+    }
     this.initialize();
     this.updateNodeBindings({ hostElement: this.$el, state: this.$state });
     this.registerEvents({ delegateTo: this.$el, state: this.$state });
@@ -36,9 +41,6 @@ class Component {
         if (obj[prop] && obj[prop] == value) return;
 
         obj[prop] = value;
-        if (self.$el.id == "child") {
-          console.log(prop);
-        }
 
         // $startProxyUpdate is set to true, once all the element attributes are updated with initial state, then updating of
         // nodes is done through here
