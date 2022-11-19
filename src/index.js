@@ -96,16 +96,17 @@ export class Component {
   updateNodeBindings({ hostElement } = data, modifiedProps = []) {
     // Get all x-bind related attributes and update according to the expression provided
     walk(hostElement, (element) => {
-      let xDataAttr = getXAttributes(element, "data");
-      let data = handleXData({ self: this, hostElement, element, xDataAttr });
-      if (data) return data;
-
-      // If it is not another x-data component, we look for bind attributes and handle them
       let xAttributes = getXAttributes(element);
       if (xAttributes.length == 0) return;
       xAttributes.forEach((attribute) =>
         handleAttributes(this, { element, attribute, modifiedProps })
       );
+
+      let xDataAttr = getXAttributes(element, "data");
+      // if the element contains x-data attribute, it means
+
+      let data = handleXData({ self: this, hostElement, element, xDataAttr });
+      if (data) return data;
     });
   }
 
