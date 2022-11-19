@@ -88,13 +88,6 @@ export class Component {
     walk(this.$el, (element) => {
       let xAttrs = getXAttributes(element);
       if (xAttrs.length == 0) return;
-
-      // Remove x-cloak if present
-      if (xAttrs.includes("x-cloak")) {
-        element.removeAttribute("x-cloak");
-        if (xAttrs.length == 0) return;
-      }
-
       appendXDataToElement(element, this.$state);
     });
   }
@@ -152,3 +145,7 @@ export class Component {
 
 let element = document.querySelector("[x-data]");
 new Component(element);
+
+Array.from(document.querySelectorAll("[x-cloak]")).forEach((el) =>
+  el.removeAttribute("x-cloak")
+);
