@@ -66,20 +66,15 @@ function cleanupPreviousAddedElementsXFor(element) {
   if (element.__x_siblings && element.__x_siblings.length) {
     element.__x_siblings.forEach((siblingElement) => {
       // If sibling element is x-for or x-template we need to remove their sibling elements as well
-      let i = 1;
       if (siblingElement instanceof HTMLTemplateElement) {
-        console.log(siblingElement);
         if (siblingElement.getAttribute("x-for")) {
           // this means this is x-for template
           cleanupPreviousAddedElementsXFor(siblingElement);
-          i++;
         } else if (siblingElement.getAttribute("x-if")) {
           // this means this is x-for template
           cleanupPreviouslyAddedElementXIf(siblingElement);
-          i++;
         }
       }
-      console.log(i);
       siblingElement.remove();
     });
     element.__x_siblings.length = 0;
