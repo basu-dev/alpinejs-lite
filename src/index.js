@@ -52,13 +52,14 @@ export class Component {
 
         obj[prop] = value;
 
-        // $startProxyUpdate is set to true, once all the element attributes are updated with initial state, then updating of
-        // nodes is done through here
+        // $startProxyUpdate is set to true, once all the element attributes are updated with initial state,
+        // then updating of nodes is done through here
         if (self.$startProxyUpdate) {
           props.push(prop);
 
-          // This queueMicrotask is used so that if two props are changed by one action, two updateNodeBindings method is
-          // not called we collect all the props that are changed and fire updateNodeBindings method with array of those props
+          // This queueMicrotask is used so that if two props are changed by one action, two updateNodeBindings
+          // method is not called we collect all the props that are changed and fire updateNodeBindings method
+          // with array of those props
           queueMicrotask(() => {
             if (props.length == 0) return;
             self.updateNodeBindings({ hostElement: self.$el }, props);
@@ -77,14 +78,13 @@ export class Component {
   initialize() {
     // nested components go here. It is used inside proxify to update child components
     this.$children = [];
-    // list of event listener names attached to host Element
-    this.$eventNames = [];
     // Call init method if provided
     if (this.$state.init && typeof this.$state.init == "function") {
       this.$state.init();
     }
 
-    // Now we add current state to all element's _x__data array
+    // Now we add current state to all element's _x__data array which will be used as scope when evaluating
+    // the expression in the element
     walk(this.$el, (element) => {
       let xAttrs = getXAttributes(element);
       if (xAttrs.length == 0) return;
@@ -120,8 +120,8 @@ export class Component {
         let onAttrs = getXAttributes(element, "on");
         eventNames.push(...onAttrs);
 
-        // if the element consists x-data attribute, we only register its x-on:{event} attribute, and don't parse down its
-        // children that's why we return {ignoreChildren: true}
+        // if the element consists x-data attribute, we only register its x-on:{event} attribute, and don't parse
+        // down its children that's why we return {ignoreChildren: true}
         let xDataAttr = getXAttributes(element, "data");
         if (node !== element && xDataAttr.length) {
           return { ignoreChildren: true };
