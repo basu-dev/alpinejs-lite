@@ -46,7 +46,7 @@
         </section>
 
         <section class="todo-section" x-data='{
-            name:"basu",
+            name:"",
             incompleteTodos:[],
             completedTodos:[],
             init(){
@@ -82,7 +82,6 @@
     }'>
 
             <input type="text" x-bind:value="name" placeholder="Todo Title" x-on:input="name=$event.target.value">
-            <input type="text" x-bind:value="name" placeholder="Todo Title" x-on:input="name=$event.target.value">
             <button x-bind:hidden="name.length==0" x-bind:disabled="name.length==0" x-on:click="addTodo()">Add
                 Todo</button>
 
@@ -108,10 +107,12 @@
                     <ol>
                         <!-- This below template is  over completed to test nested for loop and if statements-->
                         <template x-for="todo in completedTodos">
-                            <li>
-                                <span x-text="todo"></span>
-                                <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
-                            </li>
+                            <template x-if="todo">
+                                <li>
+                                    <span x-text="todo"></span>
+                                    <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
+                                </li>
+                            </template>
                         </template>
                     </ol>
                 </aside>
@@ -124,7 +125,8 @@
     </div>
 
     <script type="module" src="./src/index.js"></script>
-    <!-- <script defer src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"></script> -->
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.2/cdn.js"></script> -->
 
 </body>
 

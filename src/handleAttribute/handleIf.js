@@ -16,7 +16,7 @@ export function handleIf({ element, expression, self, modifiedProps }) {
   // if expression return false and element is already added we  remove the element
 
   if (!expressionIsTrue && element.__x_sibling) {
-    cleanupPreviouslyAddedElementXIf();
+    cleanupPreviouslyAddedElementXIf(element);
     return;
   }
   // if expression is false and sibling element is not added we simply return
