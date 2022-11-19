@@ -30,6 +30,12 @@ export const getXAttributes = (el, type = "") =>
 
 export const getXBindType = (bindType) => bindType.split(":")[1];
 
+export const getXType = (attribute) => {
+  let type = attribute.split("-")[1];
+  if (type.includes("bind")) return "bind";
+  return type;
+};
+
 export const appendXDataToElement = (element, data) => {
   if (element._x__data) {
     element._x__data.push(data);

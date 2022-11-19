@@ -38,7 +38,7 @@
             }
 }'>
             <button x-on:click="changeImage()">View Another Image</button>
-            <template x-bind:if="loadingImage">
+            <template x-if="loadingImage">
                 <small> Loading...</small>
             </template>
 
@@ -46,7 +46,7 @@
         </section>
 
         <section class="todo-section" x-data='{
-            name:"Hello",
+            name:"",
             incompleteTodos:[],
             completedTodos:[],
             init(){
@@ -65,6 +65,7 @@
             },
 
             markDone(index){
+                console.log("markDone",index);
                 if(index==-1)return;
                 setTimeout(()=>{
                 let todo = this.incompleteTodos.splice(index,1);
@@ -86,14 +87,14 @@
             <section class="todo-grid">
                 <aside>
                     <h3 class="grid-title">Incomplete Todos
-                        <template x-bind:if="incompleteTodos.length">
-                            <span x-bind:text="`(`+incompleteTodos.length+`)`"></span>
+                        <template x-if="incompleteTodos.length">
+                            <span x-text="`(`+incompleteTodos.length+`)`"></span>
                         </template>
                     </h3>
                     <ol>
-                        <template x-bind:for="todo in incompleteTodos">
+                        <template x-for="todo in incompleteTodos">
                             <li>
-                                <span x-bind:text="todo"></span>
+                                <span x-text="todo"></span>
                                 <input type='checkbox' x-on:change="markDone(incompleteTodos.indexOf(todo))">
                             </li>
                         </template>
@@ -102,14 +103,14 @@
 
                 <aside>
                     <h3 class="grid-title">Completed Todos
-                        <template x-bind:if="completedTodos.length">
-                            <span x-bind:text="`(`+completedTodos.length+`)`"></span>
+                        <template x-if="completedTodos.length">
+                            <span x-text="`(`+completedTodos.length+`)`"></span>
                         </template>
                     </h3>
                     <ol>
-                        <template x-bind:for="todo in completedTodos">
+                        <template x-for="todo in completedTodos">
                             <li>
-                                <span x-bind:text="todo"></span>
+                                <span x-text="todo"></span>
                                 <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
                             </li>
                         </template>
@@ -125,6 +126,7 @@
     </div>
 
     <script type="module" src="./src/index.js"></script>
+    <!-- <script defer src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"></script> -->
 
 </body>
 

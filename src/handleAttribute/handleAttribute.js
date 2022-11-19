@@ -1,29 +1,27 @@
-import { evalString } from "../helper.js";
+import { evalString, getXBindType, getXType } from "../helper.js";
 import { handleFor } from "./handleFor.js";
 import { handleIf } from "./handleIf.js";
 
-export function handleAttributeByType(attr, { element, expression, self }) {
-  let commonObj = { element, expression, self };
-  let booleanObj = Object.assign({ attr }, commonObj);
+export function handleAttributes(
+  self,
+  { element, attribute, modifiedProps } = data
+) {
+  let expression = element.getAttribute(attribute);
+
+  if (!shouldEvaluateExpression(self, { modifiedProps, expression, element }))
+    return;
+
+  let attr = getXType(attribute);
+  let commonObj = { element, expression, self, attr };
   switch (attr) {
-    case "disabled":
-    case "checked":
-      handleBooleanAttributes(booleanObj);
-      break;
-    case "src":
-      handleBindings(booleanObj);
-      break;
-    case "value":
-      handleValue(commonObj);
+    case "bind":
+      handleBindAttribute({ element, expression, self, attribute });
       break;
     case "text":
       handleText(commonObj);
       break;
     case "html":
       handleHtml(commonObj);
-      break;
-    case "class":
-      handleClass(commonObj);
       break;
     case "if":
       handleIf(commonObj);
@@ -32,6 +30,43 @@ export function handleAttributeByType(attr, { element, expression, self }) {
       handleFor(commonObj);
       break;
   }
+}
+
+function handleBindAttribute({ element, expression, self, attribute }) {
+  let attr = getXBindType(attribute);
+  let commonObj = { element, expression, self, attr };
+  switch (attr) {
+    case "disabled":
+    case "checked":
+      handleBooleanAttributes(commonObj);
+      break;
+    case "src":
+      handleBindings(commonObj);
+      break;
+    case "value":
+      handleValue(commonObj);
+      break;
+    case "text":
+      handleText(commonObj);
+      break;
+    case "class":
+      handleClass(commonObj);
+      break;
+  }
+}
+
+function shouldEvaluateExpression(
+  self,
+  { modifiedProps, expression, element } = data
+) {
+  // todo: remove this and solve for x-for update
+  if (!self.$startProxyUpdate) return true;
+  let truth = modifiedProps.some(
+    (prop) =>
+      // todo: element._x__for_expression check remove and from handleFor.js as well
+      expression.includes(prop) || element._x__for_expression?.includes(prop)
+  );
+  return truth;
 }
 
 function handleValue({ element, expression }) {

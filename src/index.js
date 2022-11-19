@@ -4,17 +4,17 @@
 3. Update the Dom with the data state
 4. Listen for events in the DOM tree
 */
-import { handleAttributeByType } from "./handle/handle.js";
+import { handleAttributes } from "./handleAttribute/handleAttribute.js";
+import { handleXData } from "./handleAttribute/handleXData.js";
 import {
   appendXDataToElement,
   evalString,
   getXAttributes,
-  getXBindType,
   walk,
 } from "./helper.js";
 import { handleListener } from "./registerEvents.js";
 
-class Component {
+export class Component {
   constructor(el) {
     this.$el = el;
     // This _x__component is used in case this element is nested inside another x-data to determine whether
@@ -58,7 +58,7 @@ class Component {
           props.push(prop);
 
           // This queueMicrotask is used so that if two props are changed by one action, two updateNodeBindings method is
-          // not calle we collect all the props that are changed and fire updateNodeBindings method with array of those props
+          // not called we collect all the props that are changed and fire updateNodeBindings method with array of those props
           queueMicrotask(() => {
             if (props.length == 0) return;
             self.updateNodeBindings({ hostElement: self.$el }, props);
@@ -77,6 +77,8 @@ class Component {
   initialize() {
     // nested components go here. It is used inside proxify to update child components
     this.$children = [];
+    // list of event listener names attached to host Element
+    this.$eventNames = [];
     // Call init method if provided
     if (this.$state.init && typeof this.$state.init == "function") {
       this.$state.init();
@@ -95,66 +97,49 @@ class Component {
     // Get all x-bind related attributes and update according to the expression provided
     walk(hostElement, (element) => {
       let xDataAttr = getXAttributes(element, "data");
-      // If xDataAttr is present, it means there is a nested x-data so we need to create a new component instance
-      // for the element, and we want to push the component to $children array of the component
-      // And parent component no longer walks inside child component elements, it stops walking inside the tree
-      // and goes to next sibling, it is now responsibility of child component to handle its element's updates
-      if (element !== hostElement && xDataAttr.length) {
-        if (!element._x__component) {
-          let child = new Component(element);
-          this.$children.push(child);
-        }
-        // This return statement means the the children of this element will not be walked, and next sibling will be targeted
-        return { ignoreChildren: true };
-      }
+      let data = handleXData({ self: this, hostElement, element, xDataAttr });
+      if (data) return data;
 
       // If it is not another x-data component, we look for bind attributes and handle them
-      let attrTypes = getXAttributes(element, "bind");
-      if (attrTypes.length == 0) return;
-      attrTypes.forEach((attrType) =>
-        this.handleBindAttributes(element, attrType, { modifiedProps })
+      let xAttributes = getXAttributes(element);
+      if (xAttributes.length == 0) return;
+      xAttributes.forEach((attribute) =>
+        handleAttributes(this, { element, attribute, modifiedProps })
       );
     });
   }
 
-  shouldEvaluateExpression(modifiedProps, expression, element) {
-    // todo: remove this and solve for x-for update
-    if (!this.$startProxyUpdate) return true;
-    let truth = modifiedProps.some(
-      (prop) =>
-        // todo: element._x__for_expression check remove and from handleFor.js as well
-        expression.includes(prop) || element._x__for_expression?.includes(prop)
-    );
-    return truth;
-  }
-
-  handleBindAttributes(element, attrType, { modifiedProps } = data) {
-    let expression = element.getAttribute(attrType);
-    if (!this.shouldEvaluateExpression(modifiedProps, expression, element))
-      return;
-
-    let attr = getXBindType(attrType);
-    let commonObj = {
-      element,
-      expression,
-      self: this,
-    };
-
-    handleAttributeByType(attr, commonObj);
-  }
-
   registerEvents({ delegateTo }) {
-    // List out all the possible events that would occur in the html and add listener only on root element, called event delegation
-    let xOnAttrs = [];
-    walk(this.$el, (element) => {
-      let onAttrs = getXAttributes(element, "on");
-      if (onAttrs.length == 0) return;
-      xOnAttrs = [...xOnAttrs, ...onAttrs];
-    });
+    let eventNames = [];
 
-    xOnAttrs = [...new Set(xOnAttrs)];
+    // This function walks through all elements recursively including the element inside template tag
+    // and populates eventnames array with all x-on:{event} attributes
+    function lookUpEvents(node, eventNames) {
+      walk(node, (element) => {
+        let onAttrs = getXAttributes(element, "on");
+        eventNames.push(...onAttrs);
 
-    xOnAttrs.forEach((type) => handleListener(type, { delegateTo }));
+        // if the element consists x-data attribute, we only register its x-on:{event} attribute, and don't parse down its
+        // children that's why we return {ignoreChildren: true}
+        let xDataAttr = getXAttributes(element, "data");
+        if (node !== element && xDataAttr.length) {
+          return { ignoreChildren: true };
+        }
+
+        // if the element is <template> element we need to find all x-on:{event} attributes inside its element
+        if (element instanceof HTMLTemplateElement) {
+          let templateContentElement =
+            element.content.cloneNode(true).children[0];
+          lookUpEvents(templateContentElement, eventNames);
+        }
+      });
+    }
+
+    lookUpEvents(this.$el, eventNames);
+
+    eventNames = [...new Set(eventNames)];
+
+    eventNames.forEach((type) => handleListener(type, { delegateTo }));
   }
 }
 

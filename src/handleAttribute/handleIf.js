@@ -10,17 +10,27 @@ export function handleIf({ element, expression, self }) {
   let _template = element.content.cloneNode(true);
   let requiredElement = _template.children[0];
 
-  // We will check if the element is already added after template tag,
-  // if  element is already we remove and check the expression to be true or not
-  if (element.__x_sibling) {
+  let expressionIsTrue = evalString(expression, element._x__data);
+
+  // if expression return false and element is already added we  remove the element
+
+  if (!expressionIsTrue && element.__x_sibling) {
     element.__x_sibling.remove();
     element.__x_sibling = null;
+    return;
   }
-  let truth = evalString(expression, element._x__data);
-  // If the expression results true, we add the element after template tag and set
-  // __x_sibling as the added element, so that we can remove that later ( like done in above lines)
+  // if expression is false and sibling element is not added we simply return
+  if (!expressionIsTrue) return;
 
-  if (!truth) return;
+  // If expression is true and sibling element is already added we do nothing
+  if (expressionIsTrue && element.__x_sibling) {
+    return;
+  }
+
+  // If the expression results true and sibling element is not added yet,
+  //  we add the element after template tag and set__x_sibling as the added element,
+  // so that we can remove that later ( done in first case above )
+
   walk(requiredElement, (elem) => {
     // Now all the element added should have their _x__data array for evaluating
     if (getXAttributes(elem).length) {

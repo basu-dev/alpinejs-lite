@@ -3,5 +3,8 @@
         "activityBar.background": "#4A115F",
         "titleBar.activeBackground": "#681885",
         "titleBar.activeForeground": "#FDF9FE"
-    }
+    },
+    "cSpell.words": [
+        "proxify"
+    ]
 }
