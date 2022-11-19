@@ -8,12 +8,13 @@ export function handleAttributes(
   { element, attribute, modifiedProps } = data
 ) {
   let expression = element.getAttribute(attribute);
+  if (element.classList.contains("tes")) console.log(element);
 
   if (!shouldEvaluateExpression(self, { modifiedProps, expression, element }))
     return;
 
   let attr = getXType(attribute);
-  let commonObj = { element, expression, self, attr };
+  let commonObj = { element, expression, self, attr, modifiedProps };
   switch (attr) {
     case "bind":
       handleBindAttribute({ element, expression, self, attribute });
@@ -77,6 +78,7 @@ function shouldEvaluateExpression(
 }
 
 function handleText({ element, expression }) {
+  if (element.classList.length) console.log(element);
   element.innerText = evalString(expression, element._x__data);
 }
 

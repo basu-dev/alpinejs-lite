@@ -2,10 +2,11 @@ import {
   appendXDataToElement,
   evalString,
   getXAttributes,
+  getXData,
   walk,
 } from "../helper.js";
 
-export function handleIf({ element, expression, self }) {
+export function handleIf({ element, expression, self, modifiedProps }) {
   // We will get the first child from template
   let _template = element.content.cloneNode(true);
   let requiredElement = _template.children[0];
@@ -34,10 +35,18 @@ export function handleIf({ element, expression, self }) {
   walk(requiredElement, (elem) => {
     // Now all the element added should have their _x__data array for evaluating
     if (getXAttributes(elem).length) {
-      appendXDataToElement(elem, self.$state);
+      getXData(element).forEach((d) => appendXDataToElement(elem, d));
+    }
+
+    // This is for x-if inside x-for we are using _x__for_expression for evalString.
+    // This term is also referenced in handleAttributes.js and handleFor.js
+    if (element._x__for_expression) {
+      elem._x__for_expression = element._x__for_expression;
     }
   });
 
   element.__x_sibling = requiredElement;
   element.after(requiredElement);
+
+  console.log("calling updateBiding from x-if", requiredElement);
 }

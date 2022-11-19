@@ -70,7 +70,7 @@
                 setTimeout(()=>{
                 let todo = this.incompleteTodos.splice(index,1);
                 this.incompleteTodos = [...this.incompleteTodos];
-                this.completedTodos = [...this.completedTodos,todo];
+                this.completedTodos = [...this.completedTodos,...todo];
                 },300)
             },
             removeTodo(index){
@@ -78,7 +78,8 @@
                 this.completedTodos.splice(index,1);
                 this.completedTodos = [...this.completedTodos];
                 },300)
-            }
+            },
+            indices:[1,3,5]
     }'>
 
             <input type="text" x-bind:value="name" placeholder="Todo Title" x-on:input="name=$event.target.value">
@@ -106,10 +107,13 @@
                         <span x-show="completedTodos.length>0" x-text="`(`+completedTodos.length+`)`"></span>
                     </h3>
                     <ol>
-                        <template x-for="todo in completedTodos">
+                        <template id="completeTemp" x-for="todo in completedTodos">
                             <li>
-                                <span x-text="todo"></span>
-                                <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
+                                <template x-for="index in indices">
+                                    <template x-if="index==1">
+                                        <span class="tes" x-text="todo"></span>
+                                    </template>
+                                </template>
                             </li>
                         </template>
                     </ol>

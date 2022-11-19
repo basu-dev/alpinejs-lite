@@ -2,6 +2,7 @@ import {
   appendXDataToElement,
   evalString,
   getXAttributes,
+  getXData,
   walk,
 } from "../helper.js";
 
@@ -18,6 +19,7 @@ export function handleFor({ self, element, expression }) {
 
   // Get collection from collectionLabel
   let collection = evalString(collectionLabel, element._x__data);
+  console.log(collection);
 
   let childNodes = collection.map((item, index) =>
     createSingleNode(self, element, _template, itemLabel, item, expression)
@@ -49,10 +51,13 @@ function createSingleNode(
   walk(requiredElement, (elem) => {
     // Now the element will have two states to one from scope of x-for loop another global scope
     if (getXAttributes(elem).length) {
-      appendXDataToElement(elem, self.$state);
+      getXData(element).forEach((d) => appendXDataToElement(elem, d));
+
       appendXDataToElement(elem, xForScope);
+      // console.log(elem, getXData(elem));
       // todo: find another solution for this also in shouldEvaluateExpression() method in index.js page
-      elem._x__for_expression = expression;
+      // this concatenating with + " " + is for nested x-for
+      elem._x__for_expression = element._x__for_expression + " " + expression;
     }
   });
   return requiredElement;
