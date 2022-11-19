@@ -5,6 +5,7 @@ import {
   getXData,
   walk,
 } from "../helper.js";
+import { cleanupPreviouslyAddedElementXIf } from "./handleIf.js";
 
 export function handleFor({ self, element, expression }) {
   // We will get the first child from template
@@ -12,14 +13,13 @@ export function handleFor({ self, element, expression }) {
 
   // We will check if the element is already added after template tag,
   // if  element is already we remove and check the expression to be true or not
-  cleanupPreviousAddedElements(element);
+  cleanupPreviousAddedElementsXFor(element);
 
   // split expression by 'in'
   let [itemLabel, collectionLabel] = expression.split(" in ");
 
   // Get collection from collectionLabel
   let collection = evalString(collectionLabel, element._x__data);
-  console.log(collection);
 
   let childNodes = collection.map((item, index) =>
     createSingleNode(self, element, _template, itemLabel, item, expression)
@@ -54,7 +54,6 @@ function createSingleNode(
       getXData(element).forEach((d) => appendXDataToElement(elem, d));
 
       appendXDataToElement(elem, xForScope);
-      // console.log(elem, getXData(elem));
       // todo: find another solution for this also in shouldEvaluateExpression() method in index.js page
       // this concatenating with + " " + is for nested x-for
       elem._x__for_expression = element._x__for_expression + " " + expression;
@@ -63,9 +62,26 @@ function createSingleNode(
   return requiredElement;
 }
 
-function cleanupPreviousAddedElements(element) {
+function cleanupPreviousAddedElementsXFor(element) {
   if (element.__x_siblings && element.__x_siblings.length) {
-    element.__x_siblings.forEach((item) => item.remove());
+    element.__x_siblings.forEach((siblingElement) => {
+      // If sibling element is x-for or x-template we need to remove their sibling elements as well
+      let i = 1;
+      if (siblingElement instanceof HTMLTemplateElement) {
+        console.log(siblingElement);
+        if (siblingElement.getAttribute("x-for")) {
+          // this means this is x-for template
+          cleanupPreviousAddedElementsXFor(siblingElement);
+          i++;
+        } else if (siblingElement.getAttribute("x-if")) {
+          // this means this is x-for template
+          cleanupPreviouslyAddedElementXIf(siblingElement);
+          i++;
+        }
+      }
+      console.log(i);
+      siblingElement.remove();
+    });
     element.__x_siblings.length = 0;
   }
 }

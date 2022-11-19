@@ -74,9 +74,12 @@
                 },300)
             },
             removeTodo(index){
+                console.log(this.completedTodos,index);
                 setTimeout(()=>{
                 this.completedTodos.splice(index,1);
                 this.completedTodos = [...this.completedTodos];
+
+                console.log(this.completedTodos,index);
                 },300)
             },
             indices:[1,3,5]
@@ -107,13 +110,11 @@
                         <span x-show="completedTodos.length>0" x-text="`(`+completedTodos.length+`)`"></span>
                     </h3>
                     <ol>
+                        <!-- This below template is  over completed to test nested for loop and if statements-->
                         <template id="completeTemp" x-for="todo in completedTodos">
                             <li>
-                                <template x-for="index in indices">
-                                    <template x-if="index==1">
-                                        <span class="tes" x-text="todo"></span>
-                                    </template>
-                                </template>
+                                <span x-text="todo"></span>
+                                <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
                             </li>
                         </template>
                     </ol>

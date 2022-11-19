@@ -8,7 +8,6 @@ export function handleAttributes(
   { element, attribute, modifiedProps } = data
 ) {
   let expression = element.getAttribute(attribute);
-  if (element.classList.contains("tes")) console.log(element);
 
   if (!shouldEvaluateExpression(self, { modifiedProps, expression, element }))
     return;
@@ -78,7 +77,6 @@ function shouldEvaluateExpression(
 }
 
 function handleText({ element, expression }) {
-  if (element.classList.length) console.log(element);
   element.innerText = evalString(expression, element._x__data);
 }
 

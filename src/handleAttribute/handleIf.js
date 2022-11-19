@@ -16,8 +16,7 @@ export function handleIf({ element, expression, self, modifiedProps }) {
   // if expression return false and element is already added we  remove the element
 
   if (!expressionIsTrue && element.__x_sibling) {
-    element.__x_sibling.remove();
-    element.__x_sibling = null;
+    cleanupPreviouslyAddedElementXIf();
     return;
   }
   // if expression is false and sibling element is not added we simply return
@@ -47,6 +46,9 @@ export function handleIf({ element, expression, self, modifiedProps }) {
 
   element.__x_sibling = requiredElement;
   element.after(requiredElement);
+}
 
-  console.log("calling updateBiding from x-if", requiredElement);
+export function cleanupPreviouslyAddedElementXIf(templateElement) {
+  templateElement.__x_sibling.remove();
+  templateElement.__x_sibling = null;
 }
