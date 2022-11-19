@@ -118,9 +118,8 @@
         </section>
     </main>
 
-    <div class="info" x-data="{link:'https://github.com/basu-dev/alpinejs-lite'}">
-        This todo application is built with my <a x-bind:data-target="'modal'" target="_blank"
-            x-bind:href="link">alpinejs lite</a> library
+    <div class="info" x-data='{link:" https://github.com/basu-dev/alpinejs-lite",target:"_blank"}'>
+        This todo application is built with my <a x-bind:target="target" x-bind:href="link">alpinejs lite</a> library
     </div>
 
     <script type="module" src="./src/index.js"></script>
