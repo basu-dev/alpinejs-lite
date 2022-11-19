@@ -1,4 +1,5 @@
 import { evalString, getXBindType, getXType } from "../helper.js";
+import { booleanAttributes } from "./attributeList.js";
 import { handleFor } from "./handleFor.js";
 import { handleIf } from "./handleIf.js";
 
@@ -38,23 +39,26 @@ export function handleAttributes(
 function handleBindAttribute({ element, expression, self, attribute }) {
   let attr = getXBindType(attribute);
   let commonObj = { element, expression, self, attr };
+
+  if (booleanAttributes.includes(attr)) {
+    handleBooleanAttributes(commonObj);
+    return;
+  }
+
   switch (attr) {
-    case "disabled":
-    case "checked":
-      handleBooleanAttributes(commonObj);
-      break;
-    case "src":
-      handleBindings(commonObj);
-      break;
-    case "value":
-      handleValue(commonObj);
-      break;
     case "text":
       handleText(commonObj);
       break;
     case "class":
       handleClass(commonObj);
       break;
+    case "value":
+      // Value doesn't have one to one mapping between element's "value attribute" and element's "value property"
+      // so we have to handle it differently
+      handleValue(commonObj);
+      break;
+    default:
+      handleNonBooleanAttributes(commonObj);
   }
 }
 
@@ -72,10 +76,6 @@ function shouldEvaluateExpression(
   return truth;
 }
 
-function handleValue({ element, expression }) {
-  element.value = evalString(expression, element._x__data);
-}
-
 function handleText({ element, expression }) {
   element.innerText = evalString(expression, element._x__data);
 }
@@ -84,12 +84,16 @@ function handleHtml({ element, expression }) {
   element.innerHTML = evalString(expression, element._x__data);
 }
 
+function handleValue({ attr, element, expression }) {
+  element[attr] = evalString(expression, element._x__data);
+}
+
 function handleBooleanAttributes({ attr, element, expression }) {
   element[attr] = evalString(expression, element._x__data);
 }
 
-function handleBindings({ attr, element, expression }) {
-  element[attr] = evalString(expression, element._x__data);
+function handleNonBooleanAttributes({ attr, element, expression }) {
+  element.setAttribute(attr, evalString(expression, element._x__data));
 }
 
 function handleClass({ element, expression }) {

@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="./assets/style.css">
 </head>
 
-<body>
+<body x-data>
     <nav>
         <h1>Todo Manager</h1>
         <a target="_blank" href="https://github.com/basu-dev/alpinejs-lite">
@@ -20,7 +20,7 @@
         </a>
     </nav>
 
-    <main x-data>
+    <main>
         <section class="image-section" x-data='{
             imageWidth:"",
             loadingImage:false,
@@ -46,7 +46,7 @@
         </section>
 
         <section class="todo-section" x-data='{
-            name:"",
+            name:"basu",
             incompleteTodos:[],
             completedTodos:[],
             init(){
@@ -82,7 +82,9 @@
     }'>
 
             <input type="text" x-bind:value="name" placeholder="Todo Title" x-on:input="name=$event.target.value">
-            <button x-bind:disabled="name.length==0" x-on:click="addTodo()">Add Todo</button>
+            <input type="text" x-bind:value="name" placeholder="Todo Title" x-on:input="name=$event.target.value">
+            <button x-bind:hidden="name.length==0" x-bind:disabled="name.length==0" x-on:click="addTodo()">Add
+                Todo</button>
 
             <section class="todo-grid">
                 <aside>
@@ -116,9 +118,9 @@
         </section>
     </main>
 
-    <div class="info">
-        This todo application is built with my <a target="_blank"
-            href="https://github.com/basu-dev/alpinejs-lite">alpinejs lite</a> library
+    <div class="info" x-data="{link:'https://github.com/basu-dev/alpinejs-lite'}">
+        This todo application is built with my <a x-bind:data-target="'modal'" target="_blank"
+            x-bind:href="link">alpinejs lite</a> library
     </div>
 
     <script type="module" src="./src/index.js"></script>
