@@ -104,3 +104,7 @@ nav img:hover{
         text-align: center;
         font-size:.85rem;
     }
+
+    [x-cloak]{
+        display:none;
+    }

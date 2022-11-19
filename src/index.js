@@ -89,6 +89,12 @@ export class Component {
       let xAttrs = getXAttributes(element);
       if (xAttrs.length == 0) return;
 
+      // Remove x-cloak if present
+      if (xAttrs.includes("x-cloak")) {
+        element.removeAttribute("x-cloak");
+        if (xAttrs.length == 0) return;
+      }
+
       appendXDataToElement(element, this.$state);
     });
   }

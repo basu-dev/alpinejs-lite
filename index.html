@@ -82,7 +82,7 @@
     }'>
 
             <input type="text" x-bind:value="name" placeholder="Todo Title" x-on:input="name=$event.target.value">
-            <button x-bind:disabled="name.length==0" x-on:click="addTodo()">Add
+            <button x-cloak x-bind:disabled="name.length==0" x-on:click="addTodo()">Add
                 Todo</button>
 
             <section class="todo-grid">
