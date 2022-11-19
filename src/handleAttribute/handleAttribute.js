@@ -29,6 +29,9 @@ export function handleAttributes(
     case "for":
       handleFor(commonObj);
       break;
+    case "show":
+      handleShow(commonObj);
+      break;
   }
 }
 
@@ -102,5 +105,14 @@ function handleClass({ element, expression }) {
     let appliedClass = element.getAttribute(reflectAttr);
     if (appliedClass) element.classList.remove(appliedClass);
     element.removeAttribute(reflectAttr);
+  }
+}
+
+function handleShow({ element, expression }) {
+  let expressionIsTrue = evalString(expression, element._x__data);
+  if (expressionIsTrue) {
+    element.style.removeProperty("display");
+  } else {
+    element.style.setProperty("display", "none");
   }
 }

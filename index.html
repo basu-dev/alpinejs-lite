@@ -87,9 +87,7 @@
             <section class="todo-grid">
                 <aside>
                     <h3 class="grid-title">Incomplete Todos
-                        <template x-if="incompleteTodos.length">
-                            <span x-text="`(`+incompleteTodos.length+`)`"></span>
-                        </template>
+                        <span x-show="incompleteTodos.length>0" x-text="`(`+incompleteTodos.length+`)`"></span>
                     </h3>
                     <ol>
                         <template x-for="todo in incompleteTodos">
@@ -103,9 +101,7 @@
 
                 <aside>
                     <h3 class="grid-title">Completed Todos
-                        <template x-if="completedTodos.length">
-                            <span x-text="`(`+completedTodos.length+`)`"></span>
-                        </template>
+                        <span x-show="completedTodos.length>0" x-text="`(`+completedTodos.length+`)`"></span>
                     </h3>
                     <ol>
                         <template x-for="todo in completedTodos">
