@@ -29,5 +29,5 @@ alpinejs concept was started in this branch.
 To checkout to Original Branch
 
 ```bash
-git checkout b origin/original
+git checkout origin/original
 ```
