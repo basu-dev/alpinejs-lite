@@ -27,7 +27,7 @@
                 <small> Loading...</small>
             </template>
 
-            <img id="change-img" x-bind:src="src">
+            <img x-ref="image" id="change-img" x-bind:src="src">
         </section>
 
         <section class="todo-section" x-data='todoComponent'>

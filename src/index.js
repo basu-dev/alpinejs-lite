@@ -39,7 +39,7 @@ const imageComponent = () => ({
   loadingImage: false,
   src: "https://picsum.photos/534/225.webp",
   init() {
-    document.getElementById("change-img").addEventListener("load", () => {
+    this.$refs.image.addEventListener("load", () => {
       this.loadingImage = false;
     });
   },
