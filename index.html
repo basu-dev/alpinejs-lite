@@ -39,7 +39,8 @@
             <section class="todo-grid">
                 <aside>
                     <h3 class="grid-title">Incomplete Todos
-                        <span x-show="incompleteTodos.length>0" x-text="`(`+incompleteTodos.length+`)`"></span>
+                        <span x-bind:class="incompleteTodos.length>3?'red':''" x-show="incompleteTodos.length>0"
+                            x-text="`(`+incompleteTodos.length+`)`"></span>
                     </h3>
                     <ol>
                         <template x-for="todo in incompleteTodos">
@@ -53,7 +54,8 @@
 
                 <aside>
                     <h3 class="grid-title">Completed Todos
-                        <span x-show="completedTodos.length>0" x-text="`(`+completedTodos.length+`)`"></span>
+                        <span x-bind:class="completedTodos.length>3?'red':''" x-show="completedTodos.length>0"
+                            x-text="`(`+completedTodos.length+`)`"></span>
                     </h3>
                     <ol>
                         <!-- This below template is  over completed to test nested for loop and if statements-->
