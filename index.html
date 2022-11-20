@@ -54,8 +54,13 @@
 
                 <aside>
                     <h3 class="grid-title">Completed Todos
-                        <span x-bind:class="completedTodos.length>3?'red':''" x-show="completedTodos.length>0"
-                            x-text="`(`+completedTodos.length+`)`"></span>
+                        <template x-if="completedTodos.length>0">
+                            <span>
+                                <span x-bind:class="completedTodos.length>3?'red':''" x-show="completedTodos.length>0"
+                                    x-text="`(`+completedTodos.length+`)`"></span>
+                                <div class="test-name" x-text="name"></div>
+                            </span>
+                        </template>
                     </h3>
                     <ol>
                         <!-- This below template is  over completed to test nested for loop and if statements-->
