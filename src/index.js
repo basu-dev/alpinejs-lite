@@ -7,7 +7,7 @@ const todoComponent = () => ({
     fetch("https://jsonplaceholder.typicode.com/todos")
       .then((data) => data.json())
       .then((data) => {
-        data.length = 4;
+        data.length = 5;
         this.incompleteTodos = data.map((d) => d.title);
       })
       .catch();
