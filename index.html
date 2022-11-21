@@ -49,7 +49,8 @@
                                     <span x-text="index+1+') '"></span>
                                     <span x-text="todo"></span>
                                 </div>
-                                <input type='checkbox' x-on:change="markDone(incompleteTodos.indexOf(todo))">
+                                <input title="Mark As Complete" type='checkbox'
+                                    x-on:change="markDone(incompleteTodos.indexOf(todo))">
                             </li>
                         </template>
                     </ol>
@@ -69,7 +70,8 @@
                                     <span x-text="index+1+') '"></span>
                                     <span x-text="todo"></span>
                                 </div>
-                                <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
+                                <input title="Remove" type='checkbox'
+                                    x-on:change="removeTodo(completedTodos.indexOf(todo))">
                             </li>
                         </template>
                     </ol>

@@ -4,11 +4,11 @@ const todoComponent = () => ({
   incompleteTodos: [],
   completedTodos: [],
   init() {
-    fetch("https://jsonplaceholder.typicode.com/todos")
+    fetch("https://dummyjson.com/todos")
       .then((data) => data.json())
       .then((data) => {
-        data.length = 5;
-        this.incompleteTodos = data.map((d) => d.title);
+        data.todos.length = 5;
+        this.incompleteTodos = data.todos.map((todo) => todo.todo);
       })
       .catch();
   },
