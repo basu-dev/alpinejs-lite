@@ -43,9 +43,12 @@
                             x-text="`(`+incompleteTodos.length+`)`"></span>
                     </h3>
                     <ol>
-                        <template x-for="todo in incompleteTodos">
+                        <template x-for="(todo,index) in incompleteTodos">
                             <li>
-                                <span x-text="todo"></span>
+                                <div>
+                                    <span x-text="index+1+') '"></span>
+                                    <span x-text="todo"></span>
+                                </div>
                                 <input type='checkbox' x-on:change="markDone(incompleteTodos.indexOf(todo))">
                             </li>
                         </template>
@@ -60,13 +63,14 @@
                     </h3>
                     <ol>
                         <!-- This below template is  over completed to test nested for loop and if statements-->
-                        <template x-for="todo in completedTodos">
-                            <template x-if="todo">
-                                <li>
+                        <template x-for="(todo,index) in completedTodos">
+                            <li>
+                                <div>
+                                    <span x-text="index+1+') '"></span>
                                     <span x-text="todo"></span>
-                                    <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
-                                </li>
-                            </template>
+                                </div>
+                                <input type='checkbox' x-on:change="removeTodo(completedTodos.indexOf(todo))">
+                            </li>
                         </template>
                     </ol>
                 </aside>
